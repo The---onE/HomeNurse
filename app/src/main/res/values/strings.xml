@@ -17,18 +17,25 @@
     <string name="logout">注销</string>
     <string name="username">帐号</string>
     <string name="username_hint">病案号/手机号</string>
+    <string name="username_empty">请输入帐号</string>
     <string name="password">密码</string>
     <string name="password_hint">请输入登录密码</string>
+    <string name="password_empty">请输入密码</string>
     <string name="register">注册</string>
     <string name="register_hint">新用户？立即注册</string>
     <string name="forget_password">忘记密码？</string>
 
     <string name="logo">logo</string>
 
-    <string name="record_data">测量数据</string>
+    <string name="measure_data">测量数据</string>
 
     <string name="temperature">体温</string>
     <string name="pules">脉搏</string>
     <string name="heart_rate">心率</string>
     <string name="blood_pressure">血压</string>
+
+    <string name="measure_schedule">定时测量设置</string>
+    <string name="add">+</string>
+    <string name="temperature_unit">°C</string>
+    <string name="blood_pressure_unit">mmHg</string>
 </resources>

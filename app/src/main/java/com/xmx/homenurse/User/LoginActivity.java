@@ -2,7 +2,9 @@ package com.xmx.homenurse.User;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.EditText;
 
 import com.xmx.homenurse.ActivityBase.BaseActivity;
 import com.xmx.homenurse.Constants;
@@ -24,8 +26,18 @@ public class LoginActivity extends BaseActivity {
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DataManager.getInstance().login();
-                startActivity(MainActivity.class);
+                AutoCompleteTextView usernameView = getViewById(R.id.tv_username);
+                String username = usernameView.getText().toString();
+                EditText passwordView = getViewById(R.id.tv_password);
+                String password = passwordView.getText().toString();
+                if (username.equals("")) {
+                    showToast(R.string.username_empty);
+                } else if (password.equals("")) {
+                    showToast(R.string.password_empty);
+                } else {
+                    DataManager.getInstance().login();
+                    startActivity(MainActivity.class);
+                }
             }
         });
     }

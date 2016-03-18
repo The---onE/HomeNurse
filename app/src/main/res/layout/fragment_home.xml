@@ -5,10 +5,11 @@
     android:orientation="vertical"
     tools:context=".Fragment.HomeFragment">
 
+    <!-- 测量数据 -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/record_data"
+        android:text="@string/measure_data"
         android:textSize="20sp" />
 
     <View
@@ -17,7 +18,6 @@
         android:background="@android:color/darker_gray" />
 
     <LinearLayout
-
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
@@ -27,14 +27,16 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
+            <!-- 体温 -->
             <RelativeLayout
+                android:id="@+id/layout_temperature"
                 android:layout_width="0dp"
-                android:layout_height="150dp"
+                android:layout_height="120dp"
                 android:layout_weight="1">
 
                 <ImageView
                     android:layout_width="80dp"
-                    android:layout_height="80dp"
+                    android:layout_height="60dp"
                     android:layout_alignParentTop="true"
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="20dp"
@@ -55,14 +57,16 @@
                 android:layout_height="match_parent"
                 android:background="@android:color/darker_gray" />
 
+            <!-- 脉搏 -->
             <RelativeLayout
+                android:id="@+id/layout_pules"
                 android:layout_width="0dp"
-                android:layout_height="150dp"
+                android:layout_height="120dp"
                 android:layout_weight="1">
 
                 <ImageView
                     android:layout_width="80dp"
-                    android:layout_height="80dp"
+                    android:layout_height="60dp"
                     android:layout_alignParentTop="true"
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="20dp"
@@ -90,14 +94,16 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
+            <!-- 心率 -->
             <RelativeLayout
+                android:id="@+id/layout_heart_rate"
                 android:layout_width="0dp"
-                android:layout_height="150dp"
+                android:layout_height="120dp"
                 android:layout_weight="1">
 
                 <ImageView
                     android:layout_width="80dp"
-                    android:layout_height="80dp"
+                    android:layout_height="60dp"
                     android:layout_alignParentTop="true"
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="20dp"
@@ -118,14 +124,16 @@
                 android:layout_height="match_parent"
                 android:background="@android:color/darker_gray" />
 
+            <!-- 血压 -->
             <RelativeLayout
+                android:id="@+id/layout_blood_pressure"
                 android:layout_width="0dp"
-                android:layout_height="150dp"
+                android:layout_height="120dp"
                 android:layout_weight="1">
 
                 <ImageView
                     android:layout_width="80dp"
-                    android:layout_height="80dp"
+                    android:layout_height="60dp"
                     android:layout_alignParentTop="true"
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="20dp"
@@ -147,6 +155,41 @@
             android:layout_width="match_parent"
             android:layout_height="1px"
             android:background="@android:color/darker_gray" />
+
+        <!-- 定时测量设置 -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/measure_schedule"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/tv_add_measure_schedule"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:paddingEnd="10dp"
+                android:paddingRight="10dp"
+                android:text="@string/add"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+        </RelativeLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="@android:color/darker_gray" />
+
+        <ListView
+            android:id="@+id/list_measure_schedule"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
 
     </LinearLayout>
 </LinearLayout>
