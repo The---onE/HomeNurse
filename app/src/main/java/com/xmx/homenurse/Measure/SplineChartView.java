@@ -1,7 +1,6 @@
 package com.xmx.homenurse.Measure;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -9,7 +8,6 @@ import org.xclcharts.chart.PointD;
 import org.xclcharts.chart.SplineChart;
 import org.xclcharts.chart.SplineData;
 import org.xclcharts.common.IFormatterTextCallBack;
-import org.xclcharts.event.click.PointPosition;
 import org.xclcharts.renderer.XEnum;
 import org.xclcharts.renderer.info.AnchorDataPoint;
 import org.xclcharts.renderer.plot.PlotGrid;
@@ -19,10 +17,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Align;
-import android.graphics.Paint.Style;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.MotionEvent;
 /**
  * @ClassName SplineChart01View
  * @Description  曲线图 的例子
@@ -33,14 +29,12 @@ public class SplineChartView extends DemoView {
     private String TAG = "SplineChart01View";
     private SplineChart chart = new SplineChart();
     //分类轴标签集合
-    private LinkedList<String> labels = new LinkedList<String>();
-    private LinkedList<SplineData> chartData = new LinkedList<SplineData>();
-    Paint pToolTip = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private LinkedList<String> labels = new LinkedList<>();
+    private LinkedList<SplineData> chartData = new LinkedList<>();
 
 
     public SplineChartView(Context context) {
         super(context);
-        // TODO Auto-generated constructor stub
         initView();
     }
 
@@ -56,8 +50,6 @@ public class SplineChartView extends DemoView {
 
     private void initView()
     {
-        chartLabels();
-        chartDataSet();
         chartRender();
 
         //綁定手势滑动事件
@@ -86,7 +78,7 @@ public class SplineChartView extends DemoView {
             //chart.setXTickMarksOffsetMargin(margin);
 
             //显示边框
-            chart.showRoundBorder();
+            chart.hideBorder();
 
             //数据源
             chart.setCategories(labels);
@@ -94,15 +86,16 @@ public class SplineChartView extends DemoView {
 
             //坐标系
             //数据轴最大值
-            chart.getDataAxis().setAxisMax(100);
-            //chart.getDataAxis().setAxisMin(0);
+            chart.getDataAxis().setAxisMax(45);
+            chart.getDataAxis().setAxisMin(35);
             //数据轴刻度间隔
-            chart.getDataAxis().setAxisSteps(10);
+            chart.getDataAxis().setAxisSteps(0.5);
 
             //标签轴最大值
-            chart.setCategoryAxisMax(10);
+            chart.setCategoryAxisMax(8);
             //标签轴最小值
             chart.setCategoryAxisMin(0);
+            //数据轴刻度间隔
 
             //设置图的背景色
             //chart.setBackgroupColor(true,Color.BLACK);
@@ -154,14 +147,8 @@ public class SplineChartView extends DemoView {
 
             });
             //标题
-            chart.setTitle("Spline Chart");
-            chart.addSubtitle("(XCL-Charts Demo)");
-
-            //激活点击监听
-            chart.ActiveListenItemClick();
-            //为了让触发更灵敏，可以扩大5px的点击监听范围
-            chart.extPointClickRange(5);
-            chart.showClikedFocus();
+            chart.setTitle("体温");
+            chart.addSubtitle("七日曲线");
 
             //显示十字交叉线
             chart.showDyLine();
@@ -179,26 +166,10 @@ public class SplineChartView extends DemoView {
             chart.disableHighPrecision();
 
             //仅能横向移动
-            chart.setPlotPanMode(XEnum.PanMode.HORIZONTAL);
+            //chart.setPlotPanMode(XEnum.PanMode.FREE);
+            chart.disablePanMode();
 
-            //批注
-            List<AnchorDataPoint> mAnchorSet = new ArrayList<AnchorDataPoint>();
-
-            AnchorDataPoint an1 = new AnchorDataPoint(2,0,XEnum.AnchorStyle.CAPROUNDRECT);
-            an1.setAlpha(200);
-            an1.setBgColor(Color.RED);
-            an1.setAreaStyle(XEnum.DataAreaStyle.FILL);
-
-            AnchorDataPoint an2 = new AnchorDataPoint(1,1,XEnum.AnchorStyle.CIRCLE);
-            an2.setBgColor(Color.GRAY);
-
-            AnchorDataPoint an3 = new AnchorDataPoint(0,2,XEnum.AnchorStyle.RECT);
-            an3.setBgColor(Color.BLUE);
-
-            mAnchorSet.add(an1);
-            mAnchorSet.add(an2);
-            mAnchorSet.add(an3);
-            chart.setAnchorDataPoint(mAnchorSet);
+            chart.disableScale();
 
         } catch (Exception e) {
             // TODO Auto-generated catch block
@@ -206,104 +177,51 @@ public class SplineChartView extends DemoView {
             Log.e(TAG, e.toString());
         }
     }
-    private void chartDataSet()
+
+    public void setDataSet(double today, double d1, double d2,
+                              double d3, double d4, double d5, double d6)
     {
-		/*
-		//线1的数据集
-		List<PointD> linePoint1 = new ArrayList<PointD>();
-		linePoint1.add(new PointD(5d, 8d));
-
-		linePoint1.add(new PointD(12d, 12d));
-		linePoint1.add(new PointD(25d, 15d));
-		linePoint1.add(new PointD(30d, 30d));
-		linePoint1.add(new PointD(45d, 25d));
-
-		linePoint1.add(new PointD(55d, 33d));
-		linePoint1.add(new PointD(62d, 45d));
-		SplineData dataSeries1 = new SplineData("青菜萝卜够吃",linePoint1,
-				Color.rgb(54, 141, 238) );
-		//把线弄细点
-		dataSeries1.getLinePaint().setStrokeWidth(2);
-
-		//线2的数据集
-		List<PointD> linePoint2 = new ArrayList<PointD>();
-		linePoint2.add(new PointD(40d, 50d));
-		linePoint2.add(new PointD(55d, 55d));
-		linePoint2.add(new PointD(60d, 65d));
-		linePoint2.add(new PointD(65d, 85d));
-
-		linePoint2.add(new PointD(72d, 70d));
-		linePoint2.add(new PointD(85d, 68d));
-		SplineData dataSeries2 = new SplineData("饭管够",linePoint2,
-				Color.rgb(255, 165, 132) );
-
-
-		dataSeries2.setLabelVisible(true);
-		dataSeries2.setDotStyle(XEnum.DotStyle.RECT);
-		dataSeries2.getDotLabelPaint().setColor(Color.RED);
-
-		//设定数据源
-		chartData.add(dataSeries1);
-		chartData.add(dataSeries2);
-		*/
-
         //线1的数据集
-        List<PointD> linePoint1 = new ArrayList<PointD>();
+        List<PointD> linePoint1 = new ArrayList<>();
 
-        linePoint1.add(new PointD(2d, 8d));
-
-        linePoint1.add(new PointD(5d, 8d));
-
-        linePoint1.add(new PointD(10d, 12d));
-        //linePoint1.add(new PointD(25d, 15d));
-        //linePoint1.add(new PointD(30d, 30d));
-        //linePoint1.add(new PointD(45d, 25d));
-
-        //linePoint1.add(new PointD(55d, 33d));
-        //linePoint1.add(new PointD(62d, 45d));
-        SplineData dataSeries1 = new SplineData("青菜萝卜够吃",linePoint1,
+        linePoint1.add(new PointD(1d, today));
+        linePoint1.add(new PointD(2d, d1));
+        linePoint1.add(new PointD(3d, d2));
+        linePoint1.add(new PointD(4d, d3));
+        linePoint1.add(new PointD(5d, d4));
+        linePoint1.add(new PointD(6d, d5));
+        linePoint1.add(new PointD(7d, d6));
+        SplineData dataSeries1 = new SplineData("体温",linePoint1,
                 Color.rgb(54, 141, 238) );
-        //把线弄细点
-        dataSeries1.getLinePaint().setStrokeWidth(2);
 
-
-        //线2的数据集
-        List<PointD> linePoint2 = new ArrayList<PointD>();
-        linePoint2.add(new PointD(1d, 50d));
-        linePoint2.add(new PointD(2d, 52d));
-        linePoint2.add(new PointD(3d, 53d));
-        linePoint2.add(new PointD(8d, 55d));
-        SplineData dataSeries2 = new SplineData("饭管够",linePoint2,
-                Color.rgb(255, 165, 132) );
-
-
-        dataSeries2.setLabelVisible(true);
-        dataSeries2.setDotStyle(XEnum.DotStyle.RECT);
-        dataSeries2.getDotLabelPaint().setColor(Color.RED);
-
-        //设置round风格的标签
-        //dataSeries2.getLabelOptions().showBackground();
-        dataSeries2.getLabelOptions().getBox().getBackgroundPaint().setColor(Color.GREEN);
-        dataSeries2.getLabelOptions().getBox().setRoundRadius(8);
-        dataSeries2.getLabelOptions().setLabelBoxStyle(XEnum.LabelBoxStyle.CAPROUNDRECT);
+        dataSeries1.getLinePaint().setStrokeWidth(10);
 
         chartData.add(dataSeries1);
-        chartData.add(dataSeries2);
+
+        //批注
+        List<AnchorDataPoint> mAnchorSet = new ArrayList<>();
+        for (int i=0; i<7; ++i) {
+            AnchorDataPoint an = new AnchorDataPoint(0,i,XEnum.AnchorStyle.CAPRECT);
+            an.setAnchor("" + linePoint1.get(i).y);
+            an.setTextColor(Color.BLACK);
+            mAnchorSet.add(an);
+        }
+        chart.setAnchorDataPoint(mAnchorSet);
+
+        refreshChart();
     }
 
-    private void chartLabels()
-    {
-        labels.add("0");
-        labels.add("5");
-        labels.add("10");
-
-        //labels.add("5:52:33");
-        //labels.add("5:52:35");
-        //labels.add("5:52:37");
-        //labels.add("5:52:39");
-        //labels.add("5:52:41");
-        //labels.add("5:52:43");
-        //labels.add("5:52:45");
+    public void setLabels(int month, int day) {
+        labels.add("");
+        labels.add(""+month+"-"+(day-6));
+        labels.add(""+month+"-"+(day-5));
+        labels.add(""+month+"-"+(day-4));
+        labels.add(""+month+"-"+(day-3));
+        labels.add(""+month+"-"+(day-2));
+        labels.add(""+month+"-"+(day-1));
+        labels.add(""+month+"-"+day);
+        labels.add("");
+        refreshChart();
     }
 
     @Override
@@ -314,75 +232,4 @@ public class SplineChartView extends DemoView {
             Log.e(TAG, e.toString());
         }
     }
-
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        // TODO Auto-generated method stub
-
-        super.onTouchEvent(event);
-
-        if(event.getAction() == MotionEvent.ACTION_UP)
-        {
-            triggerClick(event.getX(),event.getY());
-        }
-        return true;
-    }
-
-
-    //触发监听
-    private void triggerClick(float x,float y)
-    {
-        //交叉线
-        if(chart.getDyLineVisible())chart.getDyLine().setCurrentXY(x,y);
-        if(!chart.getListenItemClickStatus())
-        {
-            if(chart.getDyLineVisible()&&chart.getDyLine().isInvalidate())this.invalidate();
-        }else{
-            PointPosition record = chart.getPositionRecord(x,y);
-            if( null == record) return;
-
-            if(record.getDataID() >= chartData.size()) return;
-            SplineData lData = chartData.get(record.getDataID());
-            List<PointD> linePoint =  lData.getLineDataSet();
-            int pos = record.getDataChildID();
-            int i = 0;
-            Iterator it = linePoint.iterator();
-            while(it.hasNext())
-            {
-                PointD  entry=(PointD)it.next();
-
-                if(pos == i)
-                {
-                    Double xValue = entry.x;
-                    Double yValue = entry.y;
-
-                    float r = record.getRadius();
-                    chart.showFocusPointF(record.getPosition(),r * 2);
-                    chart.getFocusPaint().setStyle(Style.STROKE);
-                    chart.getFocusPaint().setStrokeWidth(3);
-                    if(record.getDataID() >= 2)
-                    {
-                        chart.getFocusPaint().setColor(Color.BLUE);
-                    }else{
-                        chart.getFocusPaint().setColor(Color.RED);
-                    }
-
-                    //在点击处显示tooltip
-                    pToolTip.setColor(Color.RED);
-                    chart.getToolTip().setCurrentXY(x,y);
-                    chart.getToolTip().addToolTip(" Key:"+lData.getLineKey(),pToolTip);
-                    chart.getToolTip().addToolTip(" Label:"+lData.getLabel(),pToolTip);
-                    chart.getToolTip().addToolTip(" Current Value:" +Double.toString(xValue)+","+Double.toString(yValue),pToolTip);
-                    chart.getToolTip().getBackgroundPaint().setAlpha(100);
-                    this.invalidate();
-
-                    break;
-                }
-                i++;
-            }//end while
-        }
-    }
-
-
 }
