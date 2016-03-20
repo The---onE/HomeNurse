@@ -13,9 +13,9 @@ public class TemperatureActivity extends BaseTempActivity {
 
         setTitle(getString(R.string.temperature));
 
-        SplineChartView splineChartView = getViewById(R.id.spline_chart);
-        splineChartView.setLabels(3, 20);
-        splineChartView.setDataSet(37.1, 38.8, 39.2, 40.7, 37.5, 38.5, 39.5);
+        TemperatureChartView temperatureChartView = getViewById(R.id.spline_chart);
+        temperatureChartView.setLabels(3, 20);
+        temperatureChartView.setDataSet(37.1, 38.8, 39.2, 40.7, 37.5, 38.5, 39.5);
     }
 
     @Override

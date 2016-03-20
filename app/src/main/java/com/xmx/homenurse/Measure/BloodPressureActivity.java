@@ -12,6 +12,11 @@ public class BloodPressureActivity extends BaseTempActivity {
         setContentView(R.layout.activity_blood_pressure);
 
         setTitle(getString(R.string.blood_pressure));
+
+        BloodPressureChartView bloodPressureChartView = getViewById(R.id.spline_chart);
+        bloodPressureChartView.setLabels(3, 20);
+        bloodPressureChartView.setDataSet(120, 130, 135, 145, 160, 120, 110,
+                80, 70, 65, 75, 90, 75, 60);
     }
 
     @Override
