@@ -1,23 +1,28 @@
 package com.xmx.homenurse.Fragment;
 
-
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
+import com.xmx.homenurse.Data.MeasureScheduleManager;
+import com.xmx.homenurse.Measure.AddMeasureScheduleActivity;
 import com.xmx.homenurse.Measure.BloodPressureActivity;
+import com.xmx.homenurse.Measure.ScheduleAdapter;
 import com.xmx.homenurse.Measure.TemperatureActivity;
 import com.xmx.homenurse.R;
-
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class HomeFragment extends BaseFragment {
+    ScheduleAdapter adapter;
+    long version = 0;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -41,7 +46,39 @@ public class HomeFragment extends BaseFragment {
             }
         });
 
+        TextView addSchedule = (TextView) view.findViewById(R.id.tv_add_measure_schedule);
+        addSchedule.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(AddMeasureScheduleActivity.class);
+            }
+        });
+
+        adapter = new ScheduleAdapter(getContext());
+        ListView planList = (ListView) view.findViewById(R.id.list_measure_schedule);
+        planList.setAdapter(adapter);
+
+        planList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                /*Intent intent = new Intent(getBaseContext(), InformationActivity.class);
+                Plan plan = (Plan) adapter.getItem(position);
+                intent.putExtra("id", plan.getId());
+                startActivity(intent);*/
+            }
+        });
+
+        updateScheduleList();
+
         return view;
+    }
+
+    void updateScheduleList() {
+        long ver = MeasureScheduleManager.getInstance().updateMeasureSchedules();
+        if (ver != version) {
+            adapter.changeList();
+            version = ver;
+        }
     }
 
 }

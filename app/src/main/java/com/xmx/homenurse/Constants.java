@@ -19,6 +19,11 @@ public class Constants {
 
     public static final String[] DAY_OF_WEEK = {"星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"};
 
-    public static final String TOH_APP_KEY = "3cad08c00c2735add4ff8d0ff54349fb";
-    public static final String DATE_APP_KEY = "8ac56625b7096982418a4852b79335f2";
+    public static final int GENERAL_TYPE = 0;
+    public static final int DAILY_TYPE = 1;
+    public static final int PERIOD_TYPE = 2;
+
+    public static final int EARLIER_TIME = 3 * 1000;
+
+    public static final int MIN_PERIOD = 10 * 1000;
 }

@@ -33,6 +33,9 @@
         <activity
             android:name=".Measure.BloodPressureActivity"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".Measure.AddMeasureScheduleActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>
