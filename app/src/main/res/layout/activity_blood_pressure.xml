@@ -15,20 +15,19 @@
         android:background="@android:color/holo_orange_light">
 
         <TextView
-            android:id="@+id/tv_temperature"
+            android:id="@+id/tv_blood_pressure"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="110/90"
             android:textColor="#FFFFFF"
             android:textSize="64sp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/tv_temperature"
-            android:layout_toEndOf="@+id/tv_temperature"
-            android:layout_toRightOf="@+id/tv_temperature"
+            android:layout_alignBottom="@+id/tv_blood_pressure"
+            android:layout_toEndOf="@+id/tv_blood_pressure"
+            android:layout_toRightOf="@+id/tv_blood_pressure"
             android:text="@string/blood_pressure_unit"
             android:textColor="#FFFFFF"
             android:textSize="20sp" />
@@ -40,7 +39,6 @@
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
-            android:text="2016.3.18 6:00am"
             android:textColor="#FFFFFF"
             android:textSize="24sp" />
 

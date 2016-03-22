@@ -17,32 +17,32 @@ import android.util.AttributeSet;
  * @ClassName SplineChart01View
  * @Description 曲线图 的例子
  */
-public class TemperatureChartView extends BaseChartView {
+public class HeartRateChartView extends BaseChartView {
 
-    public TemperatureChartView(Context context) {
+    public HeartRateChartView(Context context) {
         super(context);
     }
 
-    public TemperatureChartView(Context context, AttributeSet attrs) {
+    public HeartRateChartView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public TemperatureChartView(Context context, AttributeSet attrs, int defStyle) {
+    public HeartRateChartView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
 
     public void setDataSet(double today, double d1, double d2,
                            double d3, double d4, double d5, double d6) {
         //标题
-        chart.setTitle("体温");
+        chart.setTitle("心率");
         chart.addSubtitle("七日曲线");
 
         //坐标系
         //数据轴最大值
-        chart.getDataAxis().setAxisMax(45);
-        chart.getDataAxis().setAxisMin(35);
+        chart.getDataAxis().setAxisMax(140);
+        chart.getDataAxis().setAxisMin(50);
         //数据轴刻度间隔
-        chart.getDataAxis().setAxisSteps(0.5);
+        chart.getDataAxis().setAxisSteps(5);
 
         //线1的数据集
         List<PointD> linePoint1 = new ArrayList<>();
@@ -54,7 +54,7 @@ public class TemperatureChartView extends BaseChartView {
         linePoint1.add(new PointD(5d, d4));
         linePoint1.add(new PointD(6d, d5));
         linePoint1.add(new PointD(7d, d6));
-        SplineData dataSeries1 = new SplineData("体温", linePoint1,
+        SplineData dataSeries1 = new SplineData("心率", linePoint1,
                 Color.rgb(54, 141, 238));
 
         dataSeries1.getLinePaint().setStrokeWidth(10);

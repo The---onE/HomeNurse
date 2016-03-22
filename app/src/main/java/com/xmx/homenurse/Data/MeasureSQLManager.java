@@ -3,11 +3,9 @@ package com.xmx.homenurse.Data;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import com.xmx.homenurse.Constants;
 
-import java.io.File;
 import java.util.Date;
 
 /**

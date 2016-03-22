@@ -14,7 +14,9 @@ import com.xmx.homenurse.Data.MeasureSQLManager;
 import com.xmx.homenurse.Data.MeasureScheduleManager;
 import com.xmx.homenurse.Measure.AddMeasureScheduleActivity;
 import com.xmx.homenurse.Measure.BloodPressureActivity;
+import com.xmx.homenurse.Measure.HeartRateActivity;
 import com.xmx.homenurse.Measure.MeasureSchedule;
+import com.xmx.homenurse.Measure.PulesActivity;
 import com.xmx.homenurse.Measure.ScheduleAdapter;
 import com.xmx.homenurse.Measure.TemperatureActivity;
 import com.xmx.homenurse.R;
@@ -37,6 +39,22 @@ public class HomeFragment extends BaseFragment {
             @Override
             public void onClick(View v) {
                 startActivity(TemperatureActivity.class);
+            }
+        });
+
+        RelativeLayout pules = (RelativeLayout) view.findViewById(R.id.layout_pules);
+        pules.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(PulesActivity.class);
+            }
+        });
+
+        RelativeLayout heartRate = (RelativeLayout) view.findViewById(R.id.layout_heart_rate);
+        heartRate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(HeartRateActivity.class);
             }
         });
 

@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     android:orientation="vertical"
-    tools:context="com.xmx.homenurse.Measure.TemperatureActivity">
+    tools:context="com.xmx.homenurse.Measure.PulesActivity">
 
     <include layout="@layout/tool_bar" />
 
@@ -15,7 +15,7 @@
         android:background="@android:color/holo_orange_light">
 
         <TextView
-            android:id="@+id/tv_temperature"
+            android:id="@+id/tv_pules"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
@@ -25,10 +25,10 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/tv_temperature"
-            android:layout_toEndOf="@+id/tv_temperature"
-            android:layout_toRightOf="@+id/tv_temperature"
-            android:text="@string/temperature_unit"
+            android:layout_alignBottom="@+id/tv_pules"
+            android:layout_toEndOf="@+id/tv_pules"
+            android:layout_toRightOf="@+id/tv_pules"
+            android:text="@string/pules_unit"
             android:textColor="#FFFFFF"
             android:textSize="20sp" />
 
@@ -44,7 +44,7 @@
 
     </RelativeLayout>
 
-    <com.xmx.homenurse.Measure.TemperatureChartView
+    <com.xmx.homenurse.Measure.PulesChartView
         android:id="@+id/spline_chart"
         android:layout_width="match_parent"
         android:layout_height="300dp" />
