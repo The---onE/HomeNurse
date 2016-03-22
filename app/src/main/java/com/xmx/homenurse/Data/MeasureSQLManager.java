@@ -13,11 +13,10 @@ import java.util.Date;
 /**
  * Created by The_onE on 2015/10/23.
  */
-public class MeasureSQLManager {
+public class MeasureSQLManager extends BaseSQLManager {
     private static MeasureSQLManager instance;
-
-    SQLiteDatabase database = null;
     long version = System.currentTimeMillis();
+    boolean openFlag = false;
 
     public synchronized static MeasureSQLManager getInstance() {
         if (null == instance) {
@@ -67,19 +66,8 @@ public class MeasureSQLManager {
     }
 
     private boolean openDatabase() {
-        String d = android.os.Environment.getExternalStorageDirectory() + Constants.DATABASE_DIR;
-        File dir = new File(d);
-        boolean flag = dir.exists() || dir.mkdirs();
-
-        if (flag) {
-            String sqlFile = android.os.Environment.getExternalStorageDirectory() + Constants.DATABASE_FILE;
-            File file = new File(sqlFile);
-            database = SQLiteDatabase.openOrCreateDatabase(file, null);
-            if (database == null) {
-                Log.e("DatabaseError", "创建文件失败");
-                return false;
-            }
-            // ID TITLE TEXT PHOTO TIME
+        SQLiteDatabase database = openSQLFile();
+        if (database != null) {
             String createScheduleSQL = "create table if not exists MEASURE_SCHEDULE(" +
                     "ID integer not null primary key autoincrement, " +
                     "TITLE text not null, " +
@@ -92,28 +80,26 @@ public class MeasureSQLManager {
                     "REPEAT integer default(-1)" +
                     ")";
             database.execSQL(createScheduleSQL);
+            openFlag = true;
         } else {
-            Log.e("DatabaseError", "创建目录失败");
-            return false;
+            openFlag = false;
         }
-        return database != null;
+        return openFlag;
     }
 
     private boolean checkDatabase() {
-        return database != null || openDatabase();
+        return openFlag || openDatabase();
     }
 
-    public boolean clearDatabase() {
+    public boolean clearSchedule() {
         if (!checkDatabase()) {
             return false;
-        }
-        String clear = "delete from MEASURE_SCHEDULE";
-        database.execSQL(clear);
-        String zero = "delete from sqlite_sequence where NAME = 'MEASURE_SCHEDULE'";
-        database.execSQL(zero);
+        } else {
+            clearDatabase("MEASURE_SCHEDULE");
 
-        version++;
-        return true;
+            version++;
+            return true;
+        }
     }
 
     public long insertSchedule(String title, String text, Date date, int type, int repeat, int period) {
@@ -130,7 +116,7 @@ public class MeasureSQLManager {
         content.put("REPEAT", repeat);
         content.put("STATUS", 0);
 
-        long id = database.insert("MEASURE_SCHEDULE", null, content);
+        long id = insertData("MEASURE_SCHEDULE", content);
 
         version++;
 
@@ -138,7 +124,7 @@ public class MeasureSQLManager {
     }
 
     public long insertSchedule(long id, String title, String text, long actualTime,
-                           long planTime, int type, int repeat, int status, int period) {
+                               long planTime, int type, int repeat, int status, int period) {
         if (!checkDatabase()) {
             return -1;
         }
@@ -153,7 +139,7 @@ public class MeasureSQLManager {
         content.put("REPEAT", repeat);
         content.put("STATUS", status);
 
-        database.insert("MEASURE_SCHEDULE", null, content);
+        insertData("MEASURE_SCHEDULE", content);
 
         version++;
 
@@ -164,12 +150,14 @@ public class MeasureSQLManager {
         if (!checkDatabase()) {
             return null;
         }
-        return database.rawQuery("select * from MEASURE_SCHEDULE where STATUS = 0 order by ACTUAL_TIME asc limit " + 1, null);
+        return selectLatest("MEASURE_SCHEDULE", "ACTUAL_TIME", "STATUS", "0");
     }
 
     public void cancelSchedule(int id) {
-        String update = "update MEASURE_SCHEDULE set STATUS = 1 where ID = " + id;
-        database.execSQL(update);
+        if (!checkDatabase()) {
+            return;
+        }
+        updateDate("MEASURE_SCHEDULE", id, "STATUS", "1");
         version++;
     }
 
@@ -179,14 +167,13 @@ public class MeasureSQLManager {
             return false;
         }
         if (c.moveToFirst()) {
-            String update;
             int type = getType(c);
             switch (type) {
                 case Constants.GENERAL_TYPE: {
-                    update = "update MEASURE_SCHEDULE set STATUS = 1 where ID = " + id;
+                    updateDate("MEASURE_SCHEDULE", id, "STATUS", "1");
                 }
-
                 break;
+
                 case Constants.DAILY_TYPE: {
                     long planTime = getPlanTime(c);
                     long now = System.currentTimeMillis();
@@ -199,11 +186,11 @@ public class MeasureSQLManager {
 
                     int repeat = getRepeat(c);
                     if (repeat < 0) {
-                        update = "update MEASURE_SCHEDULE set ACTUAL_TIME = " + newTime +
-                                ", PLAN_TIME = " + newTime + " where ID = " + id;
+                        updateDate("MEASURE_SCHEDULE", id, "ACTUAL_TIME", "" + newTime,
+                                "PLAN_TIME", "" + newTime);
                     } else {
-                        update = "update MEASURE_SCHEDULE set ACTUAL_TIME = " + newTime +
-                                ", PLAN_TIME = " + newTime + ", REPEAT = 1 where ID = " + id;
+                        updateDate("MEASURE_SCHEDULE", id, "ACTUAL_TIME", "" + newTime,
+                                "PLAN_TIME", "" + newTime, "REPEAT", "1");
                     }
                 }
                 break;
@@ -214,48 +201,18 @@ public class MeasureSQLManager {
 
                     int repeat = getRepeat(c);
                     if (repeat < 0) {
-                        update = "update MEASURE_SCHEDULE set ACTUAL_TIME = " + newTime +
-                                ", PLAN_TIME = " + newTime + " where ID = " + id;
+                        updateDate("MEASURE_SCHEDULE", id, "ACTUAL_TIME", "" + newTime,
+                                "PLAN_TIME", "" + newTime);
                     } else {
-                        update = "update MEASURE_SCHEDULE set ACTUAL_TIME = " + newTime +
-                                ", PLAN_TIME = " + newTime + ", REPEAT = 1 where ID = " + id;
+                        updateDate("MEASURE_SCHEDULE", id, "ACTUAL_TIME", "" + newTime,
+                                "PLAN_TIME", "" + newTime, "REPEAT", "1");
                     }
                 }
                 break;
 
                 default:
-                    update = "";
                     break;
             }
-            database.execSQL(update);
-
-            version++;
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public boolean delaySchedule(int id, long newTime) {
-        Cursor c = selectById(id);
-        if (c == null) {
-            return false;
-        }
-        if (c.moveToFirst()) {
-            String update;
-            int repeat = getRepeat(c);
-            if (repeat < 0) {
-                update = "update MEASURE_SCHEDULE set ACTUAL_TIME = " + newTime + " where ID = " + id;
-            } else {
-                repeat--;
-                if (repeat <= 0) {
-                    completeSchedule(id);
-                    return false;
-                } else {
-                    update = "update MEASURE_SCHEDULE set ACTUAL_TIME = " + newTime + ", REPEAT = " + repeat + " where ID = " + id;
-                }
-            }
-            database.execSQL(update);
 
             version++;
             return true;
@@ -268,13 +225,13 @@ public class MeasureSQLManager {
         if (!checkDatabase()) {
             return null;
         }
-        return database.rawQuery("select * from MEASURE_SCHEDULE where STATUS = 0 order by ACTUAL_TIME", null);
+        return selectByCondition("MEASURE_SCHEDULE", "ACTUAL_TIME", "STATUS", "0");
     }
 
     public Cursor selectById(int id) {
         if (!checkDatabase()) {
             return null;
         }
-        return database.rawQuery("select * from MEASURE_SCHEDULE where ID=" + id, null);
+        return selectById("MEASURE_SCHEDULE", id);
     }
 }

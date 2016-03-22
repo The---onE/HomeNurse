@@ -28,6 +28,7 @@ public class MeFragment extends BaseFragment {
             public void onClick(View v) {
                 DataManager.getInstance().logout();
                 startActivity(LoginActivity.class);
+                getActivity().finish();
             }
         });
 

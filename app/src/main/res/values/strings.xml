@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">私人护士</string>
+    <string name="app_name">医依</string>
     <string name="app_type">患者端</string>
 
     <string name="action_settings">设置</string>

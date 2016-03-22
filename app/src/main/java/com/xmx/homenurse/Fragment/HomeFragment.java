@@ -10,9 +10,11 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.xmx.homenurse.Data.MeasureSQLManager;
 import com.xmx.homenurse.Data.MeasureScheduleManager;
 import com.xmx.homenurse.Measure.AddMeasureScheduleActivity;
 import com.xmx.homenurse.Measure.BloodPressureActivity;
+import com.xmx.homenurse.Measure.MeasureSchedule;
 import com.xmx.homenurse.Measure.ScheduleAdapter;
 import com.xmx.homenurse.Measure.TemperatureActivity;
 import com.xmx.homenurse.R;
@@ -65,6 +67,9 @@ public class HomeFragment extends BaseFragment {
                 Plan plan = (Plan) adapter.getItem(position);
                 intent.putExtra("id", plan.getId());
                 startActivity(intent);*/
+                MeasureSchedule measureSchedule = (MeasureSchedule) adapter.getItem(position);
+                MeasureSQLManager.getInstance().cancelSchedule(measureSchedule.getId());
+                updateScheduleList();
             }
         });
 

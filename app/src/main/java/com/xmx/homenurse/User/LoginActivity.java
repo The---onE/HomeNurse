@@ -37,6 +37,7 @@ public class LoginActivity extends BaseActivity {
                 } else {
                     DataManager.getInstance().login();
                     startActivity(MainActivity.class);
+                    finish();
                 }
             }
         });
