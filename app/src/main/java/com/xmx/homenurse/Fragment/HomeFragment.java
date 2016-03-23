@@ -1,5 +1,6 @@
 package com.xmx.homenurse.Fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -10,16 +11,19 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.xmx.homenurse.Constants;
 import com.xmx.homenurse.Data.MeasureSQLManager;
 import com.xmx.homenurse.Data.MeasureScheduleManager;
 import com.xmx.homenurse.Measure.AddMeasureScheduleActivity;
 import com.xmx.homenurse.Measure.BloodPressureActivity;
 import com.xmx.homenurse.Measure.HeartRateActivity;
 import com.xmx.homenurse.Measure.MeasureSchedule;
+import com.xmx.homenurse.Measure.MeasureTimerService;
 import com.xmx.homenurse.Measure.PulesActivity;
 import com.xmx.homenurse.Measure.ScheduleAdapter;
 import com.xmx.homenurse.Measure.TemperatureActivity;
 import com.xmx.homenurse.R;
+import com.xmx.homenurse.Timer;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -92,6 +96,16 @@ public class HomeFragment extends BaseFragment {
         });
 
         updateScheduleList();
+        Timer timer = new Timer() {
+            @Override
+            public void timer() {
+                updateScheduleList();
+            }
+        };
+        timer.start(Constants.UPDATE_FREQUENCY);
+
+        Intent service = new Intent(getContext(), MeasureTimerService.class);
+        getContext().startService(service);
 
         return view;
     }

@@ -54,7 +54,7 @@ public class BaseSQLManager {
             content += strings[i] + " = ";
             content += strings[++i] + " ";
             for (i++; i < strings.length; ++i) {
-                content += "and " + strings[i] + " = ";
+                content += ", " + strings[i] + " = ";
                 content += strings[++i] + " ";
             }
         } else {

@@ -10,6 +10,8 @@ public class Constants {
 
     public static final long LONGEST_EXIT_TIME = 2000;
 
+    public static final long UPDATE_FREQUENCY = 1000;
+
     public static final long DAY_TIME = 60 * 60 * 24 * 1000;
     public static final long HOUR_TIME = 60 * 60 * 1000;
     public static final long MINUTE_TIME = 60 * 1000;

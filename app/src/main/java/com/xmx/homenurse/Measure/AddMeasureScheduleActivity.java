@@ -139,7 +139,7 @@ public class AddMeasureScheduleActivity extends BaseTempActivity {
         String title = titleText.getText().toString();
         String text = textText.getText().toString();
 
-        int repeat = -1;
+        int repeat = 1;
 
         boolean dailyFlag = dailyCheck.isChecked();
         boolean periodFlag = periodCheck.isChecked();

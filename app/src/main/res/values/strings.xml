@@ -2,6 +2,8 @@
     <string name="app_name">医依</string>
     <string name="app_type">患者端</string>
 
+    <string name="scheduling">正在管理您的健康</string>
+
     <string name="action_settings">设置</string>
 
     <string name="confirm_exit">再按一次退出程序</string>
