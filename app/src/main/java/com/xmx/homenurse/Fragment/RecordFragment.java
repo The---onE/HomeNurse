@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.xmx.homenurse.Constants;
 import com.xmx.homenurse.Data.RecordSQLManager;
 import com.xmx.homenurse.Datepicker.DateManager;
 import com.xmx.homenurse.Datepicker.bizs.calendars.DPCManager;
@@ -94,17 +95,20 @@ public class RecordFragment extends BaseFragment {
         if (c.moveToFirst()) {
             do {
                 long time = RecordSQLManager.getTime(c);
-                Date date = new Date(time);
-                date.setHours(0);
-                date.setMinutes(0);
-                date.setSeconds(0);
+                Date temp = new Date(time);
+
+                Date date = new Date(0);
+                date.setYear(temp.getYear());
+                date.setMonth(temp.getMonth());
+                date.setDate(temp.getDate());
+                long t = date.getTime();
                 int type = RecordSQLManager.getType(c);
-                if (!dates.containsKey(date)) {
-                    dates.put(date.getTime(), type);
+                if (!dates.containsKey(t)) {
+                    dates.put(t, type);
                 } else {
-                    int old = dates.get(date);
+                    int old = dates.get(t);
                     if (old < type) {
-                        dates.put(date.getTime(), type);
+                        dates.put(t, type);
                     }
                 }
             } while (c.moveToNext());
@@ -121,7 +125,25 @@ public class RecordFragment extends BaseFragment {
         picker.setDPDecor(new DPDecor() {
             @Override
             public void drawDecorBG(Canvas canvas, Rect rect, Paint paint, String data) {
-                paint.setColor(Color.GREEN);
+                int[] day = DateManager.getDate(data);
+
+                Date d = new Date(0);
+                d.setYear(day[0] - 1900);
+                d.setMonth(day[1] - 1);
+                d.setDate(day[2]);
+                int type = dates.get(d.getTime());
+                switch (type)
+                {
+                    case Constants.GOOD_TYPE:
+                        paint.setColor(Color.GREEN);
+                        break;
+                    case Constants.HIGH_TYPE:
+                        paint.setColor(Color.BLUE);
+                        break;
+                    case Constants.HIGHEST_TYPE:
+                        paint.setColor(Color.RED);
+                        break;
+                }
                 canvas.drawCircle(rect.centerX(), rect.centerY(), rect.width() / 2, paint);
             }
         });
