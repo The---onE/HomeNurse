@@ -24,14 +24,14 @@
             android:id="@+id/title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:hint="测量"
+            android:hint="@string/measure_title"
             android:textSize="30sp" />
 
         <EditText
             android:id="@+id/text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:hint="内容" />
+            android:hint="@string/measure_text" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -42,14 +42,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="每天" />
+                android:text="@string/daily" />
 
             <CheckBox
                 android:id="@+id/period"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="周期" />
+                android:text="@string/period" />
 
             <LinearLayout
                 android:id="@+id/period_time"
@@ -68,7 +68,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="小时" />
+                    android:text="@string/hour" />
 
                 <EditText
                     android:id="@+id/period_minute"
@@ -81,7 +81,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="分钟" />
+                    android:text="@string/minute" />
 
                 <EditText
                     android:id="@+id/period_second"
@@ -94,7 +94,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="秒" />
+                    android:text="@string/second" />
             </LinearLayout>
         </LinearLayout>
 

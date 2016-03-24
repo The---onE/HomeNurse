@@ -21,7 +21,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="年" />
+            android:text="@string/year" />
 
         <EditText
             android:id="@+id/delay_month"
@@ -34,7 +34,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="月" />
+            android:text="@string/month" />
 
         <EditText
             android:id="@+id/delay_day"
@@ -47,7 +47,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="天" />
+            android:text="@string/day" />
 
         <EditText
             android:id="@+id/delay_hour"
@@ -60,7 +60,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="小时" />
+            android:text="@string/hour" />
 
         <EditText
             android:id="@+id/delay_minute"
@@ -73,7 +73,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="分钟" />
+            android:text="@string/minute" />
 
         <EditText
             android:id="@+id/delay_second"
@@ -86,7 +86,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="秒后" />
+            android:text="@string/second_after" />
     </LinearLayout>
 
     <Button
@@ -94,6 +94,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:text="添加" />
+        android:text="@string/add" />
 
 </RelativeLayout>

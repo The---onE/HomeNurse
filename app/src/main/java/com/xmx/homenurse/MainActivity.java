@@ -39,10 +39,10 @@ public class MainActivity extends BaseNavigationActivity {
         fragments.add(new MeFragment());
 
         List<String> titles = new ArrayList<>();
-        titles.add("首页");
-        titles.add("记录");
-        titles.add("预约");
-        titles.add("我");
+        titles.add(getString(R.string.home));
+        titles.add(getString(R.string.record));
+        titles.add(getString(R.string.appointment));
+        titles.add(getString(R.string.me));
 
         PagerAdapter adapter = new PagerAdapter(getSupportFragmentManager(), fragments, titles);
 

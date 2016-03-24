@@ -1,5 +1,6 @@
 package com.xmx.homenurse.Datepicker;
 
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -9,6 +10,10 @@ import java.util.regex.Pattern;
 public class DateManager {
     public static String makeString(int year, int month, int day) {
         return "" + year + "-" + month + "-" + day;
+    }
+
+    public static String makeString(Date date) {
+        return "" + (date.getYear() + 1900) + "-" + (date.getMonth() + 1) + "-" + date.getDate();
     }
 
     public static int[] getDate(String date) {

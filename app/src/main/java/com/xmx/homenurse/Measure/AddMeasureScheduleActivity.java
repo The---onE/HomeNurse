@@ -113,7 +113,9 @@ public class AddMeasureScheduleActivity extends BaseTempActivity {
         };
         ViewPager viewPager = getViewById(R.id.view_pager);
         viewPager.setAdapter(pagerAdapter);
-    }int getEditViewInt(EditText et) {
+    }
+
+    int getEditViewInt(EditText et) {
         if (!et.getText().toString().equals("")) {
             return Integer.valueOf(et.getText().toString());
         } else {

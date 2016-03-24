@@ -28,4 +28,8 @@ public class Constants {
     public static final int EARLIER_TIME = 3 * 1000;
 
     public static final int MIN_PERIOD = 10 * 1000;
+
+    public static final int GOOD_TYPE = 0;
+    public static final int HIGH_TYPE = 1;
+    public static final int HIGHEST_TYPE = 2;
 }

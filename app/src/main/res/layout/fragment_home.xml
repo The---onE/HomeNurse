@@ -175,7 +175,7 @@
                 android:layout_alignParentRight="true"
                 android:paddingEnd="10dp"
                 android:paddingRight="10dp"
-                android:text="@string/add"
+                android:text="@string/add_sign"
                 android:textSize="24sp"
                 android:textStyle="bold" />
 

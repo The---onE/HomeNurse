@@ -1,5 +1,6 @@
 package com.xmx.homenurse.Fragment;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -10,24 +11,30 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
+import com.xmx.homenurse.Data.RecordSQLManager;
 import com.xmx.homenurse.Datepicker.DateManager;
 import com.xmx.homenurse.Datepicker.bizs.calendars.DPCManager;
 import com.xmx.homenurse.Datepicker.bizs.decors.DPDecor;
 import com.xmx.homenurse.Datepicker.cons.DPMode;
 import com.xmx.homenurse.Datepicker.views.DatePicker;
 import com.xmx.homenurse.R;
+import com.xmx.homenurse.Record.AddRecordActivity;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class RecordFragment extends Fragment {
+public class RecordFragment extends BaseFragment {
     DatePicker picker;
+    Map<Long, Integer> dates = new HashMap<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -62,6 +69,16 @@ public class RecordFragment extends Fragment {
                 startActivity(intent);*/
             }
         });
+
+        TextView add = (TextView) view.findViewById(R.id.tv_add_record);
+        add.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getContext(), AddRecordActivity.class);
+                startActivity(intent);
+            }
+        });
+
         return view;
     }
 
@@ -72,25 +89,39 @@ public class RecordFragment extends Fragment {
 
         List<String> flag = new ArrayList<>();
 
-        Date date = new Date();
-        int year = date.getYear() + 1900;
-        int month = date.getMonth() + 1;
-        int day = date.getDate();
-        String s = "" + year + "-" + month + "-" + (day+2);
-        flag.add(s);
-        String b = "" + year + "-" + month + "-" + (day+1);
-        flag.add(b);
+        Cursor c = RecordSQLManager.getInstance().selectAllRecord();
+        dates.clear();
+        if (c.moveToFirst()) {
+            do {
+                long time = RecordSQLManager.getTime(c);
+                Date date = new Date(time);
+                date.setHours(0);
+                date.setMinutes(0);
+                date.setSeconds(0);
+                int type = RecordSQLManager.getType(c);
+                if (!dates.containsKey(date)) {
+                    dates.put(date.getTime(), type);
+                } else {
+                    int old = dates.get(date);
+                    if (old < type) {
+                        dates.put(date.getTime(), type);
+                    }
+                }
+            } while (c.moveToNext());
+        }
+
+        for (Map.Entry<Long, Integer> entry : dates.entrySet()) {
+            long date = entry.getKey();
+            Date d = new Date(date);
+            String s = DateManager.makeString(d);
+            flag.add(s);
+        }
 
         DPCManager.getInstance().setDecorBG(flag);
         picker.setDPDecor(new DPDecor() {
             @Override
             public void drawDecorBG(Canvas canvas, Rect rect, Paint paint, String data) {
-                int[] day = DateManager.getDate(data);
-                if (day[2] == 23) {
-                    paint.setColor(Color.RED);
-                } else {
-                    paint.setColor(Color.GREEN);
-                }
+                paint.setColor(Color.GREEN);
                 canvas.drawCircle(rect.centerX(), rect.centerY(), rect.width() / 2, paint);
             }
         });

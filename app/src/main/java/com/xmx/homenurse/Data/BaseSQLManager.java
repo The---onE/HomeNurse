@@ -64,7 +64,11 @@ public class BaseSQLManager {
         database.execSQL(update);
     }
 
-    public Cursor selectById(String name, int id) {
+    protected Cursor selectAll(String name) {
+        return database.rawQuery("select * from " + name, null);
+    }
+
+    protected Cursor selectById(String name, int id) {
         return database.rawQuery("select * from " + name + " where ID=" + id, null);
     }
 
@@ -88,7 +92,7 @@ public class BaseSQLManager {
         return database.rawQuery("select * from " + name + " " + content + " order by " + order + " asc limit " + 1, null);
     }
 
-    public Cursor selectByCondition(String name, String order, String... strings) {
+    protected Cursor selectByCondition(String name, String order, String... strings) {
         if (strings.length % 2 != 0) {
             return null;
         }
