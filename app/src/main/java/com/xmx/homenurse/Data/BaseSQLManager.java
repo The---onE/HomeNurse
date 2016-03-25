@@ -72,7 +72,7 @@ public class BaseSQLManager {
         return database.rawQuery("select * from " + name + " where ID=" + id, null);
     }
 
-    protected Cursor selectLatest(String name, String order, String... strings) {
+    protected Cursor selectLatest(String name, String order, boolean ascFlag, String... strings) {
         if (strings.length % 2 != 0) {
             return null;
         }
@@ -89,7 +89,13 @@ public class BaseSQLManager {
         } else {
             content = "";
         }
-        return database.rawQuery("select * from " + name + " " + content + " order by " + order + " asc limit " + 1, null);
+        String asc;
+        if (ascFlag) {
+            asc = "asc";
+        } else {
+            asc = "desc";
+        }
+        return database.rawQuery("select * from " + name + " " + content + " order by " + order + " " + asc + " limit " + 1, null);
     }
 
     protected Cursor selectByCondition(String name, String order, String... strings) {

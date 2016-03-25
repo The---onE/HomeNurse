@@ -8,6 +8,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,6 +37,12 @@ import java.util.Map;
 public class RecordFragment extends BaseFragment {
     DatePicker picker;
     Map<Long, Integer> dates = new HashMap<>();
+    long version = 0;
+
+    TextView titleView;
+    TextView textView;
+    TextView suggestionView;
+    CardView card;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -71,57 +78,6 @@ public class RecordFragment extends BaseFragment {
             }
         });
 
-        TextView add = (TextView) view.findViewById(R.id.tv_add_record);
-        add.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getContext(), AddRecordActivity.class);
-                startActivity(intent);
-            }
-        });
-
-        return view;
-    }
-
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        List<String> flag = new ArrayList<>();
-
-        Cursor c = RecordSQLManager.getInstance().selectAllRecord();
-        dates.clear();
-        if (c.moveToFirst()) {
-            do {
-                long time = RecordSQLManager.getTime(c);
-                Date temp = new Date(time);
-
-                Date date = new Date(0);
-                date.setYear(temp.getYear());
-                date.setMonth(temp.getMonth());
-                date.setDate(temp.getDate());
-                long t = date.getTime();
-                int type = RecordSQLManager.getType(c);
-                if (!dates.containsKey(t)) {
-                    dates.put(t, type);
-                } else {
-                    int old = dates.get(t);
-                    if (old < type) {
-                        dates.put(t, type);
-                    }
-                }
-            } while (c.moveToNext());
-        }
-
-        for (Map.Entry<Long, Integer> entry : dates.entrySet()) {
-            long date = entry.getKey();
-            Date d = new Date(date);
-            String s = DateManager.makeString(d);
-            flag.add(s);
-        }
-
-        DPCManager.getInstance().setDecorBG(flag);
         picker.setDPDecor(new DPDecor() {
             @Override
             public void drawDecorBG(Canvas canvas, Rect rect, Paint paint, String data) {
@@ -131,21 +87,111 @@ public class RecordFragment extends BaseFragment {
                 d.setYear(day[0] - 1900);
                 d.setMonth(day[1] - 1);
                 d.setDate(day[2]);
-                int type = dates.get(d.getTime());
-                switch (type)
-                {
-                    case Constants.GOOD_TYPE:
-                        paint.setColor(Color.GREEN);
-                        break;
-                    case Constants.HIGH_TYPE:
-                        paint.setColor(Color.BLUE);
-                        break;
-                    case Constants.HIGHEST_TYPE:
-                        paint.setColor(Color.RED);
-                        break;
+                if (dates.containsKey(d.getTime())) {
+                    int type = dates.get(d.getTime());
+                    switch (type) {
+                        case Constants.GOOD_TYPE:
+                            paint.setColor(Color.GREEN);
+                            break;
+                        case Constants.HIGH_TYPE:
+                            paint.setColor(Color.BLUE);
+                            break;
+                        case Constants.HIGHEST_TYPE:
+                            paint.setColor(Color.RED);
+                            break;
+                    }
+                    canvas.drawCircle(rect.centerX(), rect.centerY(), rect.width() / 2, paint);
                 }
-                canvas.drawCircle(rect.centerX(), rect.centerY(), rect.width() / 2, paint);
             }
         });
+
+        TextView add = (TextView) view.findViewById(R.id.tv_add_record);
+        add.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getContext(), AddRecordActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        titleView = (TextView) view.findViewById(R.id.tv_title);
+        textView = (TextView) view.findViewById(R.id.tv_text);
+        suggestionView = (TextView) view.findViewById(R.id.tv_suggestion);
+        card = (CardView) view.findViewById(R.id.record_card);
+
+        return view;
+    }
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        long ver = RecordSQLManager.getInstance().getVersion();
+        if (ver != version) {
+            List<String> flag = new ArrayList<>();
+
+            Cursor c = RecordSQLManager.getInstance().selectAllRecord();
+            dates.clear();
+            if (c.moveToFirst()) {
+                do {
+                    long time = RecordSQLManager.getTime(c);
+                    Date temp = new Date(time);
+
+                    Date date = new Date(0);
+                    date.setYear(temp.getYear());
+                    date.setMonth(temp.getMonth());
+                    date.setDate(temp.getDate());
+                    long t = date.getTime();
+                    int type = RecordSQLManager.getType(c);
+                    if (!dates.containsKey(t)) {
+                        dates.put(t, type);
+                    } else {
+                        int old = dates.get(t);
+                        if (old < type) {
+                            dates.put(t, type);
+                        }
+                    }
+                } while (c.moveToNext());
+            }
+
+            for (Map.Entry<Long, Integer> entry : dates.entrySet()) {
+                long date = entry.getKey();
+                Date d = new Date(date);
+                String s = DateManager.makeString(d);
+                flag.add(s);
+            }
+
+            DPCManager.getInstance().setDecorBG(flag);
+
+            Cursor latest = RecordSQLManager.getInstance().getLatestRecord();
+            if (latest.moveToFirst()) {
+                String title = RecordSQLManager.getTitle(latest);
+                String text = RecordSQLManager.getText(latest);
+                String suggestion = RecordSQLManager.getSuggestion(latest);
+
+                titleView.setText(title);
+                textView.setText(text);
+                suggestionView.setText(suggestion);
+                int type = RecordSQLManager.getType(latest);
+                int bg = Color.GRAY;
+                switch (type) {
+                    case Constants.GOOD_TYPE:
+                        bg = Color.GREEN;
+                        break;
+                    case Constants.HIGH_TYPE:
+                        bg = Color.BLUE;
+                        break;
+                    case Constants.HIGHEST_TYPE:
+                        bg = Color.RED;
+                        break;
+                }
+                card.setCardBackgroundColor(bg);
+            } else {
+                titleView.setText(R.string.no_record);
+                card.setCardBackgroundColor(Color.GRAY);
+            }
+
+            version = ver;
+        }
     }
 }

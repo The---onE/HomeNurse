@@ -148,7 +148,7 @@ public class MeasureSQLManager extends BaseSQLManager {
         if (!checkDatabase()) {
             return null;
         }
-        return selectLatest("MEASURE_SCHEDULE", "ACTUAL_TIME", "STATUS", "0");
+        return selectLatest("MEASURE_SCHEDULE", "ACTUAL_TIME", true, "STATUS", "0");
     }
 
     public void cancelSchedule(int id) {

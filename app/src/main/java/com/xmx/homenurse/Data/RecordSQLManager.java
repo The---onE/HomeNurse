@@ -115,7 +115,7 @@ public class RecordSQLManager extends BaseSQLManager {
         if (!checkDatabase()) {
             return null;
         }
-        return selectLatest("RECORD", "TIME");
+        return selectLatest("RECORD", "TIME", false);
     }
 
     public Cursor selectAllRecord() {
