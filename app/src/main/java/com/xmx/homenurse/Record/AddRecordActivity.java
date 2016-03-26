@@ -43,19 +43,11 @@ public class AddRecordActivity extends BaseTempActivity {
         recordType = 0;
     }
 
-    int getEditViewInt(EditText et) {
-        if (!et.getText().toString().equals("")) {
-            return Integer.valueOf(et.getText().toString());
-        } else {
-            return 0;
-        }
-    }
-
     @Override
     protected void setListener() {
         final TimePickerView pvTime = new TimePickerView(this, TimePickerView.Type.YEAR_MONTH_DAY);
         Calendar calendar = Calendar.getInstance();
-        pvTime.setRange(calendar.get(Calendar.YEAR), calendar.get(Calendar.YEAR) + 99);
+        pvTime.setRange(calendar.get(Calendar.YEAR)-50, calendar.get(Calendar.YEAR) + 49);
         pvTime.setTime(new Date());
         pvTime.setCancelable(true);
         pvTime.setCyclic(true);
@@ -85,6 +77,7 @@ public class AddRecordActivity extends BaseTempActivity {
         types.add(getString(R.string.record_highest));
         final OptionsPickerView pvOptions = new OptionsPickerView(this);
         pvOptions.setPicker(types);
+        pvOptions.setCancelable(true);
         pvOptions.setTitle(getString(R.string.record_type));
         pvOptions.setCyclic(false);
         pvOptions.setOnoptionsSelectListener(new OptionsPickerView.OnOptionsSelectListener() {

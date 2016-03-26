@@ -73,4 +73,21 @@
     <string name="record_text">医嘱</string>
     <string name="record_suggestion">康复建议</string>
     <string name="no_record">无最近记录</string>
+
+    <string name="name">姓名</string>
+    <string name="gender">性别</string>
+    <string name="birthday">出生日期</string>
+    <string name="height">身高</string>
+    <string name="weight">体重</string>
+    <string name="id_number">身份证号</string>
+    <string name="phone">手机号</string>
+    <string name="email">邮箱</string>
+    <string name="address">联系地址</string>
+
+    <string name="edit">编辑</string>
+    <string name="save">保存</string>
+    <string name="save_success">保存成功</string>
+    <string name="male">男</string>
+    <string name="female">女</string>
+
 </resources>

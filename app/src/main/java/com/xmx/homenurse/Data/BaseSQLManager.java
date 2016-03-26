@@ -14,6 +14,12 @@ import java.io.File;
  */
 public class BaseSQLManager {
     private SQLiteDatabase database = null;
+    long version = System.currentTimeMillis();
+    boolean openFlag = false;
+
+    public long getVersion() {
+        return version;
+    }
 
     protected SQLiteDatabase openSQLFile() {
         String d = android.os.Environment.getExternalStorageDirectory() + Constants.DATABASE_DIR;
@@ -46,7 +52,7 @@ public class BaseSQLManager {
         return database.insert(name, null, content);
     }
 
-    protected void updateDate(String name, int id, String... strings) {
+    protected void updateDate(String name, long id, String... strings) {
         String content;
         if (strings.length > 0) {
             content = "set ";
@@ -68,7 +74,7 @@ public class BaseSQLManager {
         return database.rawQuery("select * from " + name, null);
     }
 
-    protected Cursor selectById(String name, int id) {
+    protected Cursor selectById(String name, long id) {
         return database.rawQuery("select * from " + name + " where ID=" + id, null);
     }
 
