@@ -141,8 +141,7 @@
                     android:id="@+id/id_number"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:hint="@string/id_number"
-                    android:inputType="number" />
+                    android:hint="@string/id_number" />
             </LinearLayout>
 
             <LinearLayout

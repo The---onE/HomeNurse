@@ -89,5 +89,6 @@
     <string name="save_success">保存成功</string>
     <string name="male">男</string>
     <string name="female">女</string>
+    <string name="error_id">身份证号格式不正确</string>
 
 </resources>

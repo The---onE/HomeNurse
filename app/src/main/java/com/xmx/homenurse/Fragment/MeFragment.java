@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -93,20 +95,20 @@ public class MeFragment extends BaseFragment {
         });
         birthdayView.getPaint().setFlags(Paint.UNDERLINE_TEXT_FLAG);
 
-        final ArrayList<String> types = new ArrayList<>();
-        types.add(getString(R.string.male));
-        types.add(getString(R.string.female));
+        final ArrayList<String> genders = new ArrayList<>();
+        genders.add(getString(R.string.male));
+        genders.add(getString(R.string.female));
         final OptionsPickerView pvOptions = new OptionsPickerView(getContext());
-        pvOptions.setPicker(types);
+        pvOptions.setPicker(genders);
         pvOptions.setCancelable(true);
         pvOptions.setTitle(getString(R.string.gender));
         pvOptions.setCyclic(false);
         pvOptions.setOnoptionsSelectListener(new OptionsPickerView.OnOptionsSelectListener() {
             @Override
             public void onOptionsSelect(int options1, int options2, int options3) {
-                String type = types.get(options1);
+                String type = genders.get(options1);
                 genderView.setText(type);
-                gender = types.get(options1);
+                gender = genders.get(options1);
             }
         });
         genderView.setOnClickListener(new View.OnClickListener() {
@@ -119,16 +121,28 @@ public class MeFragment extends BaseFragment {
 
         birthday = new Date(0);
         gender = getString(R.string.male);
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        Date date = new Date(0);
+        birthdayView.setText(df.format(date));
+        genderView.setText(genders.get(0));
+
         long id = DataManager.getInstance().getId();
         if (id > 0) {
             Cursor c = UserSQLManager.getInstance().getUserById(id);
             if (c.moveToFirst()) {
                 nameView.setText(UserSQLManager.getName(c));
                 genderView.setText(UserSQLManager.getGender(c));
+                for (int i=0; i<genders.size(); ++i) {
+                    String s = genders.get(i);
+                    if (s.equals(UserSQLManager.getGender(c))) {
+                        pvOptions.setSelectOptions(i);
+                        break;
+                    }
+                }
 
                 long time = UserSQLManager.getBirthday(c);
-                DateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-                Date date = new Date(time);
+                date = new Date(time);
+                pvTime.setTime(date);
                 birthday = date;
                 birthdayView.setText(df.format(date));
 
@@ -138,17 +152,7 @@ public class MeFragment extends BaseFragment {
                 phoneView.setText(UserSQLManager.getPhont(c));
                 emailView.setText(UserSQLManager.getEmail(c));
                 addressView.setText(UserSQLManager.getAddress(c));
-            } else {
-                DateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-                Date date = new Date(0);
-                birthdayView.setText(df.format(date));
-                genderView.setText(types.get(0));
             }
-        } else {
-            DateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-            Date date = new Date(0);
-            birthdayView.setText(df.format(date));
-            genderView.setText(types.get(0));
         }
 
         final Button edit = (Button) view.findViewById(R.id.btn_edit);
@@ -211,7 +215,16 @@ public class MeFragment extends BaseFragment {
         String gen = "'" + gender + "'";
         float height = getEditViewFloat(heightView);
         float weight = getEditViewFloat(weightView);
-        String idNumber = "'" + idNumberView.getText().toString() + "'";
+
+        String idN = idNumberView.getText().toString();
+        String regex = "(^\\d{15}$)|(^\\d{17}([0-9]|X)$)";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(idN);
+        if (!matcher.find()) {
+            showToast(R.string.error_id);
+            return false;
+        }
+        String idNumber = "'" + idN + "'";
         String phone = "'" + phoneView.getText().toString() + "'";
         String email = "'" + emailView.getText().toString() + "'";
         String address = "'" + addressView.getText().toString() + "'";
