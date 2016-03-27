@@ -20,7 +20,7 @@ import com.xmx.homenurse.Timer;
 public class MeasureTimerService extends Service {
     long version = 0;
 
-    int latestId;
+    long latestId;
     String latestTitle;
     long latestTime;
     long latestPlanTime;
@@ -92,7 +92,7 @@ public class MeasureTimerService extends Service {
         }
     }
 
-    void showRemindNotification(int id, String title, long delay) {
+    void showRemindNotification(long id, String title, long delay) {
         int notificationId = (title + "|" + id).hashCode();
 
         Intent intent = new Intent(this, NotificationTempActivity.class);
@@ -143,7 +143,7 @@ public class MeasureTimerService extends Service {
         manager.notify(notificationId, notification);
     }
 
-    void showNotification(int id, String title, long delay) {
+    void showNotification(long id, String title, long delay) {
         int notificationId = (title + "|" + id).hashCode();
 
         Intent intent = new Intent(this, NotificationTempActivity.class);

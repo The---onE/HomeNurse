@@ -11,8 +11,6 @@ import java.util.Date;
  */
 public class RecordSQLManager extends BaseSQLManager {
     private static RecordSQLManager instance;
-    long version = System.currentTimeMillis();
-    boolean openFlag = false;
 
     public synchronized static RecordSQLManager getInstance() {
         if (null == instance) {
@@ -25,11 +23,7 @@ public class RecordSQLManager extends BaseSQLManager {
         openDatabase();
     }
 
-    public long getVersion() {
-        return version;
-    }
-
-    public static int getId(Cursor c) {
+    public static long getId(Cursor c) {
         return c.getInt(0);
     }
 

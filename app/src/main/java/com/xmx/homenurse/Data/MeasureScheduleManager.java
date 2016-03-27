@@ -40,7 +40,7 @@ public class MeasureScheduleManager {
             measureSchedules.clear();
             if (c.moveToFirst()) {
                 do {
-                    int id = MeasureSQLManager.getId(c);
+                    long id = MeasureSQLManager.getId(c);
                     String title = MeasureSQLManager.getTitle(c);
                     String text = MeasureSQLManager.getText(c);
 

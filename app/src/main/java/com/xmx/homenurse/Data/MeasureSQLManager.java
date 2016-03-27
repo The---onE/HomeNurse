@@ -13,8 +13,6 @@ import java.util.Date;
  */
 public class MeasureSQLManager extends BaseSQLManager {
     private static MeasureSQLManager instance;
-    long version = System.currentTimeMillis();
-    boolean openFlag = false;
 
     public synchronized static MeasureSQLManager getInstance() {
         if (null == instance) {
@@ -27,11 +25,7 @@ public class MeasureSQLManager extends BaseSQLManager {
         openDatabase();
     }
 
-    public long getVersion() {
-        return version;
-    }
-
-    public static int getId(Cursor c) {
+    public static long getId(Cursor c) {
         return c.getInt(0);
     }
 
@@ -151,7 +145,7 @@ public class MeasureSQLManager extends BaseSQLManager {
         return selectLatest("MEASURE_SCHEDULE", "ACTUAL_TIME", true, "STATUS", "0");
     }
 
-    public void cancelSchedule(int id) {
+    public void cancelSchedule(long id) {
         if (!checkDatabase()) {
             return;
         }
@@ -159,7 +153,7 @@ public class MeasureSQLManager extends BaseSQLManager {
         version++;
     }
 
-    public boolean completeSchedule(int id) {
+    public boolean completeSchedule(long id) {
         Cursor c = selectById(id);
         if (c == null) {
             return false;
@@ -226,7 +220,7 @@ public class MeasureSQLManager extends BaseSQLManager {
         return selectByCondition("MEASURE_SCHEDULE", "ACTUAL_TIME", "STATUS", "0");
     }
 
-    public Cursor selectById(int id) {
+    public Cursor selectById(long id) {
         if (!checkDatabase()) {
             return null;
         }

@@ -8,7 +8,7 @@ import java.util.Date;
  * Created by The_onE on 2016/1/30.
  */
 public class MeasureSchedule {
-    int mId;
+    long mId;
     String mTitle;
     String mText;
     long mTime;
@@ -20,7 +20,7 @@ public class MeasureSchedule {
     boolean mDailyFlag;
     int mPeriod;
 
-    public MeasureSchedule(int id, String title, String text, long time, boolean remindFlag, boolean dailyFlag, int period) {
+    public MeasureSchedule(long id, String title, String text, long time, boolean remindFlag, boolean dailyFlag, int period) {
         mId = id;
         mTitle = title;
         mText = text;
@@ -35,7 +35,7 @@ public class MeasureSchedule {
         mPeriod = period;
     }
 
-    public int getId() {
+    public long getId() {
         return mId;
     }
 
