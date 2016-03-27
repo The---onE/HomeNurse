@@ -63,7 +63,7 @@ public class UserSQLManager extends BaseSQLManager {
         return c.getString(9);
     }
 
-    private boolean openDatabase() {
+    protected boolean openDatabase() {
         SQLiteDatabase database = openSQLFile();
         if (database != null) {
             String createUserSQL = "create table if not exists USER(" +
@@ -85,10 +85,6 @@ public class UserSQLManager extends BaseSQLManager {
             openFlag = false;
         }
         return openFlag;
-    }
-
-    private boolean checkDatabase() {
-        return openFlag || openDatabase();
     }
 
     public boolean clearUser() {

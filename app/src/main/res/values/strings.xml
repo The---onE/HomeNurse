@@ -38,6 +38,7 @@
     <string name="colon">：</string>
 
     <string name="add">添加</string>
+    <string name="add_success">添加成功</string>
 
     <string name="measure_data">测量数据</string>
 
@@ -73,6 +74,13 @@
     <string name="record_text">医嘱</string>
     <string name="record_suggestion">康复建议</string>
     <string name="no_record">无最近记录</string>
+
+    <string name="appointment_hint">预约记录</string>
+    <string name="appointment_time">时间</string>
+    <string name="appointment_type">类型</string>
+    <string name="appointment_symptom">症状</string>
+    <string name="appointment_other">其他</string>
+    <string name="appointment_error">请输入症状</string>
 
     <string name="name">姓名</string>
     <string name="gender">性别</string>

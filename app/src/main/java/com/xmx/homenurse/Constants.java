@@ -32,4 +32,6 @@ public class Constants {
     public static final int GOOD_TYPE = 0;
     public static final int HIGH_TYPE = 1;
     public static final int HIGHEST_TYPE = 2;
+
+    public static final String[] APPOINTMENT_TYPE = {"门诊", "住院"};
 }

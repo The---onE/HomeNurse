@@ -12,7 +12,7 @@ import java.io.File;
 /**
  * Created by The_onE on 2016/3/22.
  */
-public class BaseSQLManager {
+public abstract class BaseSQLManager {
     private SQLiteDatabase database = null;
     long version = System.currentTimeMillis();
     boolean openFlag = false;
@@ -39,6 +39,12 @@ public class BaseSQLManager {
             Log.e("DatabaseError", "创建目录失败");
             return null;
         }
+    }
+
+    protected abstract boolean openDatabase();
+
+    protected boolean checkDatabase() {
+        return openFlag || openDatabase();
     }
 
     protected void clearDatabase(String name) {

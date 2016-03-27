@@ -24,7 +24,7 @@ public class RecordSQLManager extends BaseSQLManager {
     }
 
     public static long getId(Cursor c) {
-        return c.getInt(0);
+        return c.getLong(0);
     }
 
     public static String getTitle(Cursor c) {
@@ -51,7 +51,7 @@ public class RecordSQLManager extends BaseSQLManager {
         return c.getInt(6);
     }
 
-    private boolean openDatabase() {
+    protected boolean openDatabase() {
         SQLiteDatabase database = openSQLFile();
         if (database != null) {
             String createRecordSQL = "create table if not exists RECORD(" +
@@ -69,10 +69,6 @@ public class RecordSQLManager extends BaseSQLManager {
             openFlag = false;
         }
         return openFlag;
-    }
-
-    private boolean checkDatabase() {
-        return openFlag || openDatabase();
     }
 
     public boolean clearRecord() {
