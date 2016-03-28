@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.xmx.homenurse.Fragment.AppointmentFragment">
+    tools:context="com.xmx.homenurse.Fragments.AppointmentFragment">
 
     <RelativeLayout
         android:layout_width="match_parent"

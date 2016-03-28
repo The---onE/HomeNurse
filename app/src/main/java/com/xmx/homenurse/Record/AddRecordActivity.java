@@ -9,8 +9,7 @@ import android.widget.TextView;
 
 import com.bigkoo.pickerview.OptionsPickerView;
 import com.bigkoo.pickerview.TimePickerView;
-import com.xmx.homenurse.ActivityBase.BaseTempActivity;
-import com.xmx.homenurse.Data.RecordSQLManager;
+import com.xmx.homenurse.Tools.ActivityBase.BaseTempActivity;
 import com.xmx.homenurse.R;
 
 import java.text.DateFormat;

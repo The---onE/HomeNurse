@@ -3,7 +3,8 @@ package com.xmx.homenurse.Measure;
 import android.os.Bundle;
 import android.widget.TextView;
 
-import com.xmx.homenurse.ActivityBase.BaseTempActivity;
+import com.xmx.homenurse.Tools.ActivityBase.BaseTempActivity;
+import com.xmx.homenurse.Measure.ChartView.BloodPressureChartView;
 import com.xmx.homenurse.R;
 
 public class BloodPressureActivity extends BaseTempActivity {

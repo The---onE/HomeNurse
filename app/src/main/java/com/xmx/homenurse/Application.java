@@ -1,6 +1,6 @@
 package com.xmx.homenurse;
 
-import com.xmx.homenurse.Data.DataManager;
+import com.xmx.homenurse.Tools.Data.DataManager;
 
 /**
  * Created by The_onE on 2016/1/3.

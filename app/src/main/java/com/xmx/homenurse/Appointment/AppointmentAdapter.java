@@ -10,7 +10,6 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.xmx.homenurse.Constants;
-import com.xmx.homenurse.Data.AppointmentManager;
 import com.xmx.homenurse.R;
 
 import java.text.DateFormat;

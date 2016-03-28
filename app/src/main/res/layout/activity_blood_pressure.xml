@@ -44,7 +44,7 @@
 
     </RelativeLayout>
 
-    <com.xmx.homenurse.Measure.BloodPressureChartView
+    <com.xmx.homenurse.Measure.ChartView.BloodPressureChartView
         android:id="@+id/spline_chart"
         android:layout_width="match_parent"
         android:layout_height="300dp" />

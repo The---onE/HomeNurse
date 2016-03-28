@@ -3,9 +3,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.xmx.homenurse.Fragment.RecordFragment">
+    tools:context="com.xmx.homenurse.Fragments.RecordFragment">
 
-    <com.xmx.homenurse.Datepicker.views.DatePicker
+    <com.xmx.homenurse.Record.Datepicker.views.DatePicker
         android:id="@+id/date_picker"
         android:layout_width="240dp"
         android:layout_height="wrap_content"

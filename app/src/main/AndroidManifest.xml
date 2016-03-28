@@ -34,7 +34,7 @@
             android:name=".Measure.BloodPressureActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".Measure.AddMeasureScheduleActivity"
+            android:name=".Measure.Schedule.AddMeasureScheduleActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".Measure.PulesActivity"
@@ -49,11 +49,11 @@
             android:name=".Appointment.AddAppointmentActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".Measure.MeasureScheduleDetailActivity"
+            android:name=".Measure.Schedule.MeasureScheduleDetailActivity"
             android:theme="@style/AppTheme.NoActionBar" />
 
         <service
-            android:name=".Measure.MeasureTimerService"
+            android:name=".Measure.Schedule.MeasureTimerService"
             android:enabled="true"
             android:exported="true" />
     </application>

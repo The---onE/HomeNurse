@@ -6,9 +6,9 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.xmx.homenurse.ActivityBase.BaseActivity;
+import com.xmx.homenurse.Tools.ActivityBase.BaseActivity;
 import com.xmx.homenurse.Constants;
-import com.xmx.homenurse.Data.DataManager;
+import com.xmx.homenurse.Tools.Data.DataManager;
 import com.xmx.homenurse.MainActivity;
 import com.xmx.homenurse.R;
 

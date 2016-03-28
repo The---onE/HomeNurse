@@ -8,13 +8,13 @@ import android.support.v4.widget.DrawerLayout;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.xmx.homenurse.ActivityBase.BaseNavigationActivity;
-import com.xmx.homenurse.Data.DataManager;
-import com.xmx.homenurse.Fragment.AppointmentFragment;
-import com.xmx.homenurse.Fragment.HomeFragment;
-import com.xmx.homenurse.Fragment.MeFragment;
-import com.xmx.homenurse.Fragment.PagerAdapter;
-import com.xmx.homenurse.Fragment.RecordFragment;
+import com.xmx.homenurse.Tools.ActivityBase.BaseNavigationActivity;
+import com.xmx.homenurse.Tools.Data.DataManager;
+import com.xmx.homenurse.Fragments.AppointmentFragment;
+import com.xmx.homenurse.Fragments.HomeFragment;
+import com.xmx.homenurse.Fragments.MeFragment;
+import com.xmx.homenurse.Tools.PagerAdapter;
+import com.xmx.homenurse.Fragments.RecordFragment;
 import com.xmx.homenurse.User.LoginActivity;
 
 import java.util.ArrayList;
