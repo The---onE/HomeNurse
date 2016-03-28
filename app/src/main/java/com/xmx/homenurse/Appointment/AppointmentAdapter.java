@@ -91,7 +91,7 @@ public class AppointmentAdapter extends BaseAdapter {
             holder.addTime.setText(addTimeString);
 
             switch (appointment.getStatus()) {
-                case -1:
+                case Constants.STATUS_CANCELED:
                     holder.card.setCardBackgroundColor(Color.GRAY);
                     break;
                 default:

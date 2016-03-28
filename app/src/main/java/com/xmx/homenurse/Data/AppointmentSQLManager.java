@@ -4,6 +4,8 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.xmx.homenurse.Constants;
+
 import java.util.Date;
 
 /**
@@ -83,14 +85,18 @@ public class AppointmentSQLManager extends BaseSQLManager {
         content.put("TIME", date.getTime());
         content.put("TYPE", type);
         content.put("SYMPTOM", symptom);
-        content.put("STATUS", 0);
+        content.put("STATUS", Constants.STATUS_WAITING);
         content.put("ADD_TIME", add.getTime());
 
         return insertData("APPOINTMENT", content);
     }
 
     public void cancelAppointment(long id) {
-        updateDate("APPOINTMENT", id, "STATUS", "-1");
+        updateDate("APPOINTMENT", id, "STATUS", "" + Constants.STATUS_CANCELED);
+    }
+
+    public void deleteAppointment(long id) {
+        updateDate("APPOINTMENT", id, "STATUS", "" + Constants.STATUS_DELETED);
     }
 
     public Cursor selectAllAppointment() {

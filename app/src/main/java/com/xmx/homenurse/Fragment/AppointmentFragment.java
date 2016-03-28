@@ -13,6 +13,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.xmx.homenurse.Appointment.AddAppointmentActivity;
+import com.xmx.homenurse.Appointment.Appointment;
+import com.xmx.homenurse.Constants;
 import com.xmx.homenurse.Data.AppointmentManager;
 import com.xmx.homenurse.Data.AppointmentSQLManager;
 import com.xmx.homenurse.R;
@@ -47,23 +49,46 @@ public class AppointmentFragment extends BaseFragment {
         appointmentList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, final long id) {
+                Appointment appointment = (Appointment) adapter.getItem(i);
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder.setMessage("要取消预约吗？");
-                builder.setTitle("提示");
-                builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        AppointmentSQLManager.getInstance().cancelAppointment(id);
-                        updateAppointmentList();
-                    }
-                });
-                builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                    }
-                });
-                builder.show();
+                switch (appointment.getStatus()) {
+                    case Constants.STATUS_WAITING:
+                        builder.setMessage("要取消预约吗？");
+                        builder.setTitle("提示");
+                        builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                AppointmentSQLManager.getInstance().cancelAppointment(id);
+                                updateAppointmentList();
+                            }
+                        });
+                        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.dismiss();
+                            }
+                        });
+                        builder.show();
+                        break;
+                    case Constants.STATUS_CANCELED:
+                        builder.setMessage("要删除该记录吗？");
+                        builder.setTitle("提示");
+                        builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                AppointmentSQLManager.getInstance().deleteAppointment(id);
+                                updateAppointmentList();
+                            }
+                        });
+                        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.dismiss();
+                            }
+                        });
+                        builder.show();
+                        break;
+                }
                 return false;
             }
         });

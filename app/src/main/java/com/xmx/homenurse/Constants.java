@@ -34,4 +34,8 @@ public class Constants {
     public static final int HIGHEST_TYPE = 2;
 
     public static final String[] APPOINTMENT_TYPE = {"门诊", "住院"};
+
+    public static final int STATUS_WAITING = 0;
+    public static final int STATUS_CANCELED = -1;
+    public static final int STATUS_DELETED = -2;
 }
