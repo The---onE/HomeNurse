@@ -48,6 +48,9 @@
         <activity
             android:name=".Appointment.AddAppointmentActivity"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".Measure.MeasureScheduleDetailActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
 
         <service
             android:name=".Measure.MeasureTimerService"

@@ -12,12 +12,12 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.xmx.homenurse.Constants;
-import com.xmx.homenurse.Data.MeasureSQLManager;
 import com.xmx.homenurse.Data.MeasureScheduleManager;
 import com.xmx.homenurse.Measure.AddMeasureScheduleActivity;
 import com.xmx.homenurse.Measure.BloodPressureActivity;
 import com.xmx.homenurse.Measure.HeartRateActivity;
 import com.xmx.homenurse.Measure.MeasureSchedule;
+import com.xmx.homenurse.Measure.MeasureScheduleDetailActivity;
 import com.xmx.homenurse.Measure.MeasureTimerService;
 import com.xmx.homenurse.Measure.PulesActivity;
 import com.xmx.homenurse.Measure.ScheduleAdapter;
@@ -85,13 +85,10 @@ public class HomeFragment extends BaseFragment {
         planList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                /*Intent intent = new Intent(getBaseContext(), InformationActivity.class);
-                Plan plan = (Plan) adapter.getItem(position);
-                intent.putExtra("id", plan.getId());
-                startActivity(intent);*/
+                Intent intent = new Intent(getContext(), MeasureScheduleDetailActivity.class);
                 MeasureSchedule measureSchedule = (MeasureSchedule) adapter.getItem(position);
-                MeasureSQLManager.getInstance().cancelSchedule(measureSchedule.getId());
-                updateScheduleList();
+                intent.putExtra("id", measureSchedule.getId());
+                startActivity(intent);
             }
         });
 
