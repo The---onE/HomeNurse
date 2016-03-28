@@ -34,6 +34,7 @@ public abstract class BaseSQLManager {
                 Log.e("DatabaseError", "创建文件失败");
                 return null;
             }
+            version++;
             return database;
         } else {
             Log.e("DatabaseError", "创建目录失败");
@@ -52,9 +53,12 @@ public abstract class BaseSQLManager {
         database.execSQL(clear);
         String zero = "delete from sqlite_sequence where NAME = '" + name + "'";
         database.execSQL(zero);
+
+        version++;
     }
 
     protected long insertData(String name, ContentValues content) {
+        version++;
         return database.insert(name, null, content);
     }
 
@@ -74,10 +78,23 @@ public abstract class BaseSQLManager {
         }
         String update = "update " + name + " " + content + " where ID = " + id;
         database.execSQL(update);
+
+        version++;
     }
 
     protected Cursor selectAll(String name) {
         return database.rawQuery("select * from " + name, null);
+    }
+
+    protected Cursor selectAll(String name, String order, boolean ascFlag) {
+        String asc;
+        if (ascFlag) {
+            asc = "asc";
+        } else {
+            asc = "desc";
+        }
+        return database.rawQuery("select * from " + name + " order by " + order + " " + asc, null);
+
     }
 
     protected Cursor selectById(String name, long id) {

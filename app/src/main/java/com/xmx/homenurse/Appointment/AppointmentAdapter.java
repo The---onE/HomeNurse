@@ -1,6 +1,8 @@
 package com.xmx.homenurse.Appointment;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,6 +59,8 @@ public class AppointmentAdapter extends BaseAdapter {
         TextView type;
         TextView symptom;
         TextView addTime;
+
+        CardView card;
     }
 
     @Override
@@ -69,6 +73,7 @@ public class AppointmentAdapter extends BaseAdapter {
             holder.type = (TextView) convertView.findViewById(R.id.item_type);
             holder.symptom = (TextView) convertView.findViewById(R.id.item_symptom);
             holder.addTime = (TextView) convertView.findViewById(R.id.item_add_time);
+            holder.card = (CardView) convertView.findViewById(R.id.card_appointment);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
@@ -84,6 +89,15 @@ public class AppointmentAdapter extends BaseAdapter {
             holder.symptom.setText(appointment.getSymptom());
             String addTimeString = df.format(appointment.getAddTime());
             holder.addTime.setText(addTimeString);
+
+            switch (appointment.getStatus()) {
+                case -1:
+                    holder.card.setCardBackgroundColor(Color.GRAY);
+                    break;
+                default:
+                    holder.card.setCardBackgroundColor(Color.WHITE);
+                    break;
+            }
         } else {
             holder.time.setText("加载失败");
         }

@@ -84,8 +84,6 @@ public class MeasureSQLManager extends BaseSQLManager {
             return false;
         } else {
             clearDatabase("MEASURE_SCHEDULE");
-
-            version++;
             return true;
         }
     }
@@ -104,11 +102,7 @@ public class MeasureSQLManager extends BaseSQLManager {
         content.put("REPEAT", repeat);
         content.put("STATUS", 0);
 
-        long id = insertData("MEASURE_SCHEDULE", content);
-
-        version++;
-
-        return id;
+        return insertData("MEASURE_SCHEDULE", content);
     }
 
     public long insertSchedule(long id, String title, String text, long actualTime,
@@ -129,8 +123,6 @@ public class MeasureSQLManager extends BaseSQLManager {
 
         insertData("MEASURE_SCHEDULE", content);
 
-        version++;
-
         return id;
     }
 
@@ -146,7 +138,6 @@ public class MeasureSQLManager extends BaseSQLManager {
             return;
         }
         updateDate("MEASURE_SCHEDULE", id, "STATUS", "1");
-        version++;
     }
 
     public boolean completeSchedule(long id) {
@@ -201,8 +192,6 @@ public class MeasureSQLManager extends BaseSQLManager {
                 default:
                     break;
             }
-
-            version++;
             return true;
         } else {
             return false;

@@ -71,8 +71,6 @@ public class AppointmentSQLManager extends BaseSQLManager {
             return false;
         } else {
             clearDatabase("APPOINTMENT");
-
-            version++;
             return true;
         }
     }
@@ -88,14 +86,14 @@ public class AppointmentSQLManager extends BaseSQLManager {
         content.put("STATUS", 0);
         content.put("ADD_TIME", add.getTime());
 
-        long id = insertData("APPOINTMENT", content);
+        return insertData("APPOINTMENT", content);
+    }
 
-        version++;
-
-        return id;
+    public void cancelAppointment(long id) {
+        updateDate("APPOINTMENT", id, "STATUS", "-1");
     }
 
     public Cursor selectAllAppointment() {
-        return super.selectAll("APPOINTMENT");
+        return selectAll("APPOINTMENT", "TIME", true);
     }
 }

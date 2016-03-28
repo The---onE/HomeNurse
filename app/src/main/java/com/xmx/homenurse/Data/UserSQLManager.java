@@ -92,8 +92,6 @@ public class UserSQLManager extends BaseSQLManager {
             return false;
         } else {
             clearDatabase("USER");
-
-            version++;
             return true;
         }
     }
@@ -114,11 +112,7 @@ public class UserSQLManager extends BaseSQLManager {
         content.put("EMAIL", email);
         content.put("ADDRESS", address);
 
-        long id = insertData("USER", content);
-
-        version++;
-
-        return id;
+        return insertData("USER", content);
     }
 
     public Cursor getUserById(long id) {

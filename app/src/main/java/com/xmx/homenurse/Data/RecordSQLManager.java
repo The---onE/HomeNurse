@@ -76,8 +76,6 @@ public class RecordSQLManager extends BaseSQLManager {
             return false;
         } else {
             clearDatabase("RECORD");
-
-            version++;
             return true;
         }
     }
@@ -94,11 +92,7 @@ public class RecordSQLManager extends BaseSQLManager {
         content.put("STATUS", 0);
         content.put("TYPE", type);
 
-        long id = insertData("RECORD", content);
-
-        version++;
-
-        return id;
+        return insertData("RECORD", content);
     }
 
     public Cursor getLatestRecord() {
