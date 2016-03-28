@@ -9,8 +9,6 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.xmx.homenurse.Constants;
-import com.xmx.homenurse.Measure.Schedule.MeasureSchedule;
-import com.xmx.homenurse.Measure.Schedule.MeasureScheduleManager;
 import com.xmx.homenurse.R;
 
 import java.util.List;

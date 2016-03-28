@@ -11,10 +11,10 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.xmx.homenurse.Measure.Schedule.AddMeasureScheduleActivity;
 import com.xmx.homenurse.Tools.BaseFragment;
 import com.xmx.homenurse.Constants;
 import com.xmx.homenurse.Measure.Schedule.MeasureScheduleManager;
-import com.xmx.homenurse.Measure.Schedule.MeasureSchedule.AddMeasureScheduleActivity;
 import com.xmx.homenurse.Measure.BloodPressureActivity;
 import com.xmx.homenurse.Measure.HeartRateActivity;
 import com.xmx.homenurse.Measure.Schedule.MeasureSchedule;
