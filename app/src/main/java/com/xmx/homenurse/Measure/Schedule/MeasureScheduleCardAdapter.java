@@ -82,18 +82,18 @@ public class MeasureScheduleCardAdapter extends BaseAdapter {
             if (plan.isRemindFlag()) {
                 holder.remind.setVisibility(View.VISIBLE);
             } else {
-                holder.remind.setVisibility(View.INVISIBLE);
+                holder.remind.setVisibility(View.GONE);
             }
 
             if (plan.isDailyFlag()) {
                 holder.daily.setVisibility(View.VISIBLE);
             } else {
-                holder.daily.setVisibility(View.INVISIBLE);
+                holder.daily.setVisibility(View.GONE);
             }
 
             int period = plan.getPeriod();
             if (period <= 0) {
-                holder.period.setVisibility(View.INVISIBLE);
+                holder.period.setVisibility(View.GONE);
             } else {
                 String periodString = "";
                 if (period / Constants.DAY_TIME > 0) {

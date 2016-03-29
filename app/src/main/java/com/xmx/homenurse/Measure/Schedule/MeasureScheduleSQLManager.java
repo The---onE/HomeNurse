@@ -101,7 +101,7 @@ public class MeasureScheduleSQLManager extends BaseSQLManager {
         content.put("TYPE", type);
         content.put("PERIOD", period);
         content.put("REPEAT", repeat);
-        content.put("STATUS", 0);
+        content.put("STATUS", Constants.STATUS_WAITING);
 
         return insertData("MEASURE_SCHEDULE", content);
     }
@@ -131,14 +131,15 @@ public class MeasureScheduleSQLManager extends BaseSQLManager {
         if (!checkDatabase()) {
             return null;
         }
-        return selectLatest("MEASURE_SCHEDULE", "ACTUAL_TIME", true, "STATUS", "0");
+        return selectLatest("MEASURE_SCHEDULE", "ACTUAL_TIME", true,
+                "STATUS", "" + Constants.STATUS_WAITING);
     }
 
     public void cancelSchedule(long id) {
         if (!checkDatabase()) {
             return;
         }
-        updateDate("MEASURE_SCHEDULE", id, "STATUS", "1");
+        updateDate("MEASURE_SCHEDULE", id, "STATUS", "" + Constants.STATUS_CANCELED);
     }
 
     public boolean completeSchedule(long id) {
@@ -150,7 +151,7 @@ public class MeasureScheduleSQLManager extends BaseSQLManager {
             int type = getType(c);
             switch (type) {
                 case Constants.GENERAL_TYPE: {
-                    updateDate("MEASURE_SCHEDULE", id, "STATUS", "1");
+                    updateDate("MEASURE_SCHEDULE", id, "STATUS", "" + Constants.STATUS_COMPLETE);
                 }
                 break;
 
@@ -203,7 +204,8 @@ public class MeasureScheduleSQLManager extends BaseSQLManager {
         if (!checkDatabase()) {
             return null;
         }
-        return selectByCondition("MEASURE_SCHEDULE", "ACTUAL_TIME", "STATUS", "0");
+        return selectByCondition("MEASURE_SCHEDULE", "ACTUAL_TIME",
+                "STATUS", "" + Constants.STATUS_WAITING);
     }
 
     public Cursor selectById(long id) {

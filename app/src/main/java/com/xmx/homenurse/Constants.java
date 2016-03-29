@@ -38,4 +38,5 @@ public class Constants {
     public static final int STATUS_WAITING = 0;
     public static final int STATUS_CANCELED = -1;
     public static final int STATUS_DELETED = -2;
+    public static final int STATUS_COMPLETE = 1;
 }
