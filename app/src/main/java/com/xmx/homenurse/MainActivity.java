@@ -8,14 +8,16 @@ import android.support.v4.widget.DrawerLayout;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.avos.avoscloud.AVObject;
 import com.xmx.homenurse.Tools.ActivityBase.BaseNavigationActivity;
-import com.xmx.homenurse.Tools.Data.DataManager;
 import com.xmx.homenurse.Fragments.AppointmentFragment;
 import com.xmx.homenurse.Fragments.HomeFragment;
 import com.xmx.homenurse.Fragments.MeFragment;
 import com.xmx.homenurse.Tools.PagerAdapter;
 import com.xmx.homenurse.Fragments.RecordFragment;
+import com.xmx.homenurse.User.Callback.AutoLoginCallback;
 import com.xmx.homenurse.User.LoginActivity;
+import com.xmx.homenurse.User.UserManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,10 +29,36 @@ public class MainActivity extends BaseNavigationActivity {
     protected void initView(Bundle savedInstanceState) {
         setContentView(R.layout.activity_main);
 
-        if (!DataManager.getInstance().isLoggedIn()) {
-            startActivity(LoginActivity.class);
-            finish();
-        }
+        UserManager.getInstance().autoLogin(new AutoLoginCallback() {
+            @Override
+            public void success(AVObject user) {
+            }
+
+            @Override
+            public void notLoggedIn() {
+                startActivity(LoginActivity.class);
+                finish();
+            }
+
+            @Override
+            public void errorNetwork() {
+                startActivity(LoginActivity.class);
+                finish();
+            }
+
+            @Override
+            public void errorUsername() {
+                startActivity(LoginActivity.class);
+                finish();
+            }
+
+            @Override
+            public void errorChecksum() {
+                showToast(R.string.network_error);
+                startActivity(LoginActivity.class);
+                finish();
+            }
+        });
 
         List<Fragment> fragments = new ArrayList<>();
         fragments.add(new HomeFragment());

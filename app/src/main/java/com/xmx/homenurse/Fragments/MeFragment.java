@@ -11,10 +11,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.avos.avoscloud.AVObject;
 import com.bigkoo.pickerview.OptionsPickerView;
 import com.bigkoo.pickerview.TimePickerView;
 import com.xmx.homenurse.Tools.BaseFragment;
-import com.xmx.homenurse.Tools.Data.DataManager;
+import com.xmx.homenurse.User.Callback.AutoLoginCallback;
+import com.xmx.homenurse.User.UserManager;
 import com.xmx.homenurse.User.UserSQLManager;
 import com.xmx.homenurse.R;
 import com.xmx.homenurse.User.LoginActivity;
@@ -41,6 +43,8 @@ public class MeFragment extends BaseFragment {
     EditText phoneView;
     EditText emailView;
     EditText addressView;
+
+    Button edit;
 
     boolean editFlag = false;
 
@@ -122,41 +126,78 @@ public class MeFragment extends BaseFragment {
 
         birthday = new Date(0);
         gender = getString(R.string.male);
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-        Date date = new Date(0);
+        final DateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        final Date date = new Date(0);
         birthdayView.setText(df.format(date));
         genderView.setText(genders.get(0));
 
-        long id = DataManager.getInstance().getId();
-        if (id > 0) {
-            Cursor c = UserSQLManager.getInstance().getUserById(id);
-            if (c.moveToFirst()) {
-                nameView.setText(UserSQLManager.getName(c));
-                genderView.setText(UserSQLManager.getGender(c));
-                for (int i=0; i<genders.size(); ++i) {
-                    String s = genders.get(i);
-                    if (s.equals(UserSQLManager.getGender(c))) {
-                        pvOptions.setSelectOptions(i);
-                        break;
+        UserManager.getInstance().checkLogin(new AutoLoginCallback() {
+            @Override
+            public void success(AVObject user) {
+                long id = UserManager.getId(user);
+                if (id > 0) {
+                    Cursor c = UserSQLManager.getInstance().getUserById(id);
+                    if (c.moveToFirst()) {
+                        nameView.setText(UserSQLManager.getName(c));
+                        genderView.setText(UserSQLManager.getGender(c));
+                        for (int i = 0; i < genders.size(); ++i) {
+                            String s = genders.get(i);
+                            if (s.equals(UserSQLManager.getGender(c))) {
+                                pvOptions.setSelectOptions(i);
+                                break;
+                            }
+                        }
+
+                        long time = UserSQLManager.getBirthday(c);
+                        Date d = new Date(time);
+                        pvTime.setTime(d);
+                        birthday = d;
+                        birthdayView.setText(df.format(d));
+
+                        heightView.setText("" + UserSQLManager.getHeight(c));
+                        weightView.setText("" + UserSQLManager.getWeight(c));
+                        idNumberView.setText(UserSQLManager.getIdNumber(c));
+                        phoneView.setText(UserSQLManager.getPhont(c));
+                        emailView.setText(UserSQLManager.getEmail(c));
+                        addressView.setText(UserSQLManager.getAddress(c));
+                    } else {
+                        UserSQLManager.getInstance().insertUser(id, "", genders.get(0),
+                                new Date(0), 0, 0, "", "", "", "");
                     }
                 }
-
-                long time = UserSQLManager.getBirthday(c);
-                date = new Date(time);
-                pvTime.setTime(date);
-                birthday = date;
-                birthdayView.setText(df.format(date));
-
-                heightView.setText("" + UserSQLManager.getHeight(c));
-                weightView.setText("" + UserSQLManager.getWeight(c));
-                idNumberView.setText(UserSQLManager.getIdNumber(c));
-                phoneView.setText(UserSQLManager.getPhont(c));
-                emailView.setText(UserSQLManager.getEmail(c));
-                addressView.setText(UserSQLManager.getAddress(c));
             }
-        }
 
-        final Button edit = (Button) view.findViewById(R.id.btn_edit);
+            @Override
+            public void notLoggedIn() {
+                showToast(R.string.not_loggedin);
+                UserManager.getInstance().logout();
+                startActivity(LoginActivity.class);
+                getActivity().finish();
+            }
+
+            @Override
+            public void errorNetwork() {
+                showToast(R.string.network_error);
+            }
+
+            @Override
+            public void errorUsername() {
+                showToast(R.string.not_loggedin);
+                UserManager.getInstance().logout();
+                startActivity(LoginActivity.class);
+                getActivity().finish();
+            }
+
+            @Override
+            public void errorChecksum() {
+                showToast(R.string.not_loggedin);
+                UserManager.getInstance().logout();
+                startActivity(LoginActivity.class);
+                getActivity().finish();
+            }
+        });
+
+        edit = (Button) view.findViewById(R.id.btn_edit);
         edit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -173,19 +214,7 @@ public class MeFragment extends BaseFragment {
                     edit.setText(R.string.save);
                     editFlag = true;
                 } else {
-                    if (save()) {
-                        nameView.setEnabled(false);
-                        genderView.setEnabled(false);
-                        birthdayView.setEnabled(false);
-                        heightView.setEnabled(false);
-                        weightView.setEnabled(false);
-                        idNumberView.setEnabled(false);
-                        phoneView.setEnabled(false);
-                        emailView.setEnabled(false);
-                        addressView.setEnabled(false);
-                        edit.setText(R.string.edit);
-                        editFlag = false;
-                    }
+                    save();
                 }
             }
         });
@@ -194,7 +223,7 @@ public class MeFragment extends BaseFragment {
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DataManager.getInstance().logout();
+                UserManager.getInstance().logout();
                 startActivity(LoginActivity.class);
                 getActivity().finish();
             }
@@ -212,33 +241,79 @@ public class MeFragment extends BaseFragment {
     }
 
     boolean save() {
-        String name = "'" + nameView.getText().toString() + "'";
-        String gen = "'" + gender + "'";
-        float height = getEditViewFloat(heightView);
-        float weight = getEditViewFloat(weightView);
+        UserManager.getInstance().checkLogin(new AutoLoginCallback() {
+            @Override
+            public void success(AVObject user) {
+                String name = "'" + nameView.getText().toString() + "'";
+                String gen = "'" + gender + "'";
+                float height = getEditViewFloat(heightView);
+                float weight = getEditViewFloat(weightView);
 
-        String idN = idNumberView.getText().toString();
-        String regex = "(^\\d{15}$)|(^\\d{17}([0-9]|X)$)";
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(idN);
-        if (!matcher.find()) {
-            showToast(R.string.error_id);
-            return false;
-        }
-        String idNumber = "'" + idN + "'";
-        String phone = "'" + phoneView.getText().toString() + "'";
-        String email = "'" + emailView.getText().toString() + "'";
-        String address = "'" + addressView.getText().toString() + "'";
-        long id = DataManager.getInstance().getId();
-        if (id > 0) {
-            UserSQLManager.getInstance().updateUser(id, name, gen, birthday, height,
-                    weight, idNumber, phone, email, address);
-        } else {
-            long i = UserSQLManager.getInstance().insertUser(name, gen, birthday,
-                    height, weight, idNumber, phone, email, address);
-            DataManager.getInstance().setId(i);
-        }
-        showToast(R.string.save_success);
+                String idN = idNumberView.getText().toString();
+                String regex = "(^\\d{15}$)|(^\\d{17}([0-9]|X)$)";
+                Pattern pattern = Pattern.compile(regex);
+                Matcher matcher = pattern.matcher(idN);
+                if (!matcher.find()) {
+                    showToast(R.string.error_id);
+                    return;
+                }
+                String idNumber = "'" + idN + "'";
+                String phone = "'" + phoneView.getText().toString() + "'";
+                String email = "'" + emailView.getText().toString() + "'";
+                String address = "'" + addressView.getText().toString() + "'";
+
+                long id = UserManager.getId(user);
+                if (id > 0) {
+                    UserSQLManager.getInstance().updateUser(id, name, gen, birthday, height,
+                            weight, idNumber, phone, email, address);
+                } else {
+                    UserSQLManager.getInstance().insertUser(id, name, gen, birthday,
+                            height, weight, idNumber, phone, email, address);
+                }
+                showToast(R.string.save_success);
+                nameView.setEnabled(false);
+                genderView.setEnabled(false);
+                birthdayView.setEnabled(false);
+                heightView.setEnabled(false);
+                weightView.setEnabled(false);
+                idNumberView.setEnabled(false);
+                phoneView.setEnabled(false);
+                emailView.setEnabled(false);
+                addressView.setEnabled(false);
+                edit.setText(R.string.edit);
+                editFlag = false;
+            }
+
+            @Override
+            public void notLoggedIn() {
+                showToast(R.string.not_loggedin);
+                UserManager.getInstance().logout();
+                startActivity(LoginActivity.class);
+                getActivity().finish();
+            }
+
+            @Override
+            public void errorNetwork() {
+                showToast(R.string.network_error);
+            }
+
+            @Override
+            public void errorUsername() {
+                showToast(R.string.not_loggedin);
+                UserManager.getInstance().logout();
+                startActivity(LoginActivity.class);
+                getActivity().finish();
+            }
+
+            @Override
+            public void errorChecksum() {
+                showToast(R.string.not_loggedin);
+                UserManager.getInstance().logout();
+                startActivity(LoginActivity.class);
+                getActivity().finish();
+            }
+        });
+
         return true;
     }
 }

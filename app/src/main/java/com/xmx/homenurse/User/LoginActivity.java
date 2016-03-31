@@ -43,7 +43,6 @@ public class LoginActivity extends BaseActivity {
                                 @Override
                                 public void success(AVObject user) {
                                     showToast(R.string.login_success);
-                                    DataManager.getInstance().login();
                                     startActivity(MainActivity.class);
                                     finish();
                                 }

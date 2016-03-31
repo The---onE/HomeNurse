@@ -49,6 +49,8 @@
     <string name="username_exist">该用户名已被注册</string>
     <string name="nickname_exist">该昵称已被注册</string>
 
+    <string name="not_loggedin">请重新登录</string>
+
     <string name="logo">logo</string>
 
     <string name="add_sign">+</string>

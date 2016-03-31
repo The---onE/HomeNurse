@@ -98,12 +98,13 @@ public class UserSQLManager extends BaseSQLManager {
         }
     }
 
-    public long insertUser(String name, String gender, Date birthday, float height, float weight,
+    public long insertUser(long id, String name, String gender, Date birthday, float height, float weight,
                            String idNumber, String phone, String email, String address) {
         if (!checkDatabase()) {
             return -1;
         }
         ContentValues content = new ContentValues();
+        content.put("ID", id);
         content.put("NAME", name);
         content.put("GENDER", gender);
         content.put("BIRTHDAY", birthday.getTime());

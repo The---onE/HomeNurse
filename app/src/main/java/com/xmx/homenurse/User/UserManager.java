@@ -42,6 +42,11 @@ public class UserManager {
         mSP = context.getSharedPreferences("USER", Context.MODE_PRIVATE);
     }
 
+    public static long getId(AVObject user) {
+        String id = user.getObjectId();
+        return Math.abs(id.hashCode());
+    }
+
     public static String getSHA(String s) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
