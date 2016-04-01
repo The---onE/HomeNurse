@@ -95,7 +95,7 @@ public class UserManager {
     public void logout() {
         if (isLoggedIn()) {
             String username = getUsername();
-            AVQuery<AVObject> query = new AVQuery<>("UserData");
+            AVQuery<AVObject> query = new AVQuery<>("PatientsData");
             query.whereEqualTo("username", username);
             query.findInBackground(new FindCallback<AVObject>() {
                 @Override
@@ -147,7 +147,7 @@ public class UserManager {
     }
 
     public void register(final String username, final String password, final String nickname, final RegisterCallback registerCallback) {
-        final AVQuery<AVObject> query = AVQuery.getQuery("UserInf");
+        final AVQuery<AVObject> query = AVQuery.getQuery("PatientsInf");
         query.whereEqualTo("username", username);
         query.countInBackground(new CountCallback() {
             public void done(final int count, AVException e) {
@@ -155,7 +155,7 @@ public class UserManager {
                     if (count > 0) {
                         registerCallback.usernameExist();
                     } else {
-                        AVQuery<AVObject> query2 = AVQuery.getQuery("UserData");
+                        AVQuery<AVObject> query2 = AVQuery.getQuery("PatientsData");
                         query2.whereEqualTo("nickname", nickname);
                         query2.countInBackground(new CountCallback() {
                             @Override
@@ -164,13 +164,13 @@ public class UserManager {
                                     if (i > 0) {
                                         registerCallback.nicknameExist();
                                     } else {
-                                        final AVObject post = new AVObject("UserInf");
+                                        final AVObject post = new AVObject("PatientsInf");
                                         post.put("username", username);
                                         post.put("password", UserManager.getSHA(password));
                                         post.put("status", 0);
                                         post.put("timestamp", System.currentTimeMillis() / 1000);
 
-                                        final AVObject data = new AVObject("UserData");
+                                        final AVObject data = new AVObject("PatientsData");
                                         data.put("username", username);
                                         data.put("nickname", nickname);
                                         final String checksum = UserManager.makeChecksum();
@@ -209,7 +209,7 @@ public class UserManager {
     }
 
     public void login(final String username, final String password, final LoginCallback loginCallback) {
-        AVQuery<AVObject> query = new AVQuery<>("UserInf");
+        AVQuery<AVObject> query = new AVQuery<>("PatientsInf");
         query.whereEqualTo("username", username);
         query.findInBackground(new FindCallback<AVObject>() {
             @Override
@@ -261,7 +261,7 @@ public class UserManager {
             loginCallback.notLoggedIn();
             return;
         }
-        AVQuery<AVObject> query = new AVQuery<>("UserData");
+        AVQuery<AVObject> query = new AVQuery<>("PatientsData");
         query.whereEqualTo("username", username);
         query.findInBackground(new FindCallback<AVObject>() {
             @Override
@@ -305,7 +305,7 @@ public class UserManager {
             loginCallback.notLoggedIn();
             return;
         }
-        AVQuery<AVObject> query = new AVQuery<>("UserData");
+        AVQuery<AVObject> query = new AVQuery<>("PatientsData");
         query.whereEqualTo("username", username);
         query.findInBackground(new FindCallback<AVObject>() {
             @Override

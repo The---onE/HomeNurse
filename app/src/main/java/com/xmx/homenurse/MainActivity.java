@@ -42,6 +42,7 @@ public class MainActivity extends BaseNavigationActivity {
 
             @Override
             public void errorNetwork() {
+                showToast(R.string.network_error);
                 startActivity(LoginActivity.class);
                 finish();
             }
@@ -54,7 +55,6 @@ public class MainActivity extends BaseNavigationActivity {
 
             @Override
             public void errorChecksum() {
-                showToast(R.string.network_error);
                 startActivity(LoginActivity.class);
                 finish();
             }
