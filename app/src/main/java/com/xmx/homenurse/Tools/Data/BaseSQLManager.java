@@ -101,6 +101,11 @@ public abstract class BaseSQLManager {
         return database.rawQuery("select * from " + name + " where ID=" + id, null);
     }
 
+    protected Cursor selectAmount(String name, String data, String min, String max) {
+        return database.rawQuery("select * from " + name + " where " + data +
+                " between " + min + " and " + max, null);
+    }
+
     protected Cursor selectLatest(String name, String order, boolean ascFlag, String... strings) {
         if (strings.length % 2 != 0) {
             return null;

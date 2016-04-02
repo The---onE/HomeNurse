@@ -18,6 +18,7 @@ import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
 import com.avos.avoscloud.AVQuery;
 import com.avos.avoscloud.FindCallback;
+import com.xmx.homenurse.Record.RecordAmountADayActivity;
 import com.xmx.homenurse.Tools.BaseFragment;
 import com.xmx.homenurse.Constants;
 import com.xmx.homenurse.Record.RecordSQLManager;
@@ -68,24 +69,17 @@ public class RecordFragment extends BaseFragment {
         picker.setOnDatePickedListener(new DatePicker.OnDatePickedListener() {
             @Override
             public void onDatePicked(String date) {
-                /*Intent intent = new Intent(getContext(), DateInformationActivity.class);
+                Intent intent = new Intent(getContext(), RecordAmountADayActivity.class);
 
-                String regex = "(.+?)-(\\d+)-(\\d+)"; //格式为yyyy-M-d
-                Pattern pattern = Pattern.compile(regex);
-                Matcher matcher = pattern.matcher(date);
-                int year = 1900;
-                int month = 1;
-                int day = 1;
-                if (matcher.find()) {
-                    year = Integer.valueOf(matcher.group(1));
-                    month = Integer.valueOf(matcher.group(2));
-                    day = Integer.valueOf(matcher.group(3));
-                }
+                int[] d = DateManager.getDate(date);
+                int year = d[0];
+                int month = d[1];
+                int day = d[2];
                 intent.putExtra("year", year);
                 intent.putExtra("month", month);
                 intent.putExtra("day", day);
 
-                startActivity(intent);*/
+                startActivity(intent);
             }
         });
 

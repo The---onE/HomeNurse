@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.xmx.homenurse.Constants;
 import com.xmx.homenurse.Tools.Data.BaseSQLManager;
 
 import java.util.Date;
@@ -125,6 +126,18 @@ public class RecordSQLManager extends BaseSQLManager {
             return null;
         }
         return selectById("RECORD", id);
+    }
+
+    public Cursor selectRecordByDay(int year, int month, int day) {
+        if (!checkDatabase()) {
+            return null;
+        }
+        Date day1 = new Date(0);
+        day1.setYear(year - 1900);
+        day1.setMonth(month - 1);
+        day1.setDate(day);
+        return selectAmount("RECORD", "TIME", "" + day1.getTime(),
+                "" + (day1.getTime() + Constants.DAY_TIME));
     }
 
     public Cursor selectAllRecord() {
