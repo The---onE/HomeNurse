@@ -97,11 +97,34 @@ public class RecordSQLManager extends BaseSQLManager {
         return insertData("RECORD", content);
     }
 
+    public long insertRecord(int id, String title, Date date, String text, String suggestion, int type) {
+        if (!checkDatabase()) {
+            return -1;
+        }
+        ContentValues content = new ContentValues();
+        content.put("ID", id);
+        content.put("TITLE", title);
+        content.put("TIME", date.getTime());
+        content.put("TEXT", text);
+        content.put("SUGGESTION", suggestion);
+        content.put("STATUS", 0);
+        content.put("TYPE", type);
+
+        return insertData("RECORD", content);
+    }
+
     public Cursor getLatestRecord() {
         if (!checkDatabase()) {
             return null;
         }
         return selectLatest("RECORD", "TIME", false);
+    }
+
+    public Cursor selectRecordById(long id) {
+        if (!checkDatabase()) {
+            return null;
+        }
+        return selectById("RECORD", id);
     }
 
     public Cursor selectAllRecord() {

@@ -14,6 +14,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.avos.avoscloud.AVException;
+import com.avos.avoscloud.AVObject;
+import com.avos.avoscloud.AVQuery;
+import com.avos.avoscloud.FindCallback;
 import com.xmx.homenurse.Tools.BaseFragment;
 import com.xmx.homenurse.Constants;
 import com.xmx.homenurse.Record.RecordSQLManager;
@@ -24,12 +28,17 @@ import com.xmx.homenurse.Record.Datepicker.cons.DPMode;
 import com.xmx.homenurse.Record.Datepicker.views.DatePicker;
 import com.xmx.homenurse.R;
 import com.xmx.homenurse.Record.AddRecordActivity;
+import com.xmx.homenurse.User.Callback.AutoLoginCallback;
+import com.xmx.homenurse.User.UserManager;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -43,6 +52,7 @@ public class RecordFragment extends BaseFragment {
     TextView titleView;
     TextView textView;
     TextView suggestionView;
+    TextView timeView;
     CardView card;
 
     @Override
@@ -118,15 +128,68 @@ public class RecordFragment extends BaseFragment {
         titleView = (TextView) view.findViewById(R.id.tv_title);
         textView = (TextView) view.findViewById(R.id.tv_text);
         suggestionView = (TextView) view.findViewById(R.id.tv_suggestion);
+        timeView = (TextView) view.findViewById(R.id.tv_time);
         card = (CardView) view.findViewById(R.id.record_card);
+
+        syncFromCloud();
 
         return view;
     }
 
+    void syncFromCloud() {
+        UserManager.getInstance().checkLogin(new AutoLoginCallback() {
+            @Override
+            public void success(AVObject user) {
+                AVQuery<AVObject> query = new AVQuery<>("Prescription");
+                query.whereEqualTo("patient", user.getObjectId());
+                query.whereEqualTo("status", 0);
+                query.findInBackground(new FindCallback<AVObject>() {
+                    public void done(List<AVObject> avObjects, AVException e) {
+                        if (e == null) {
+                            for (AVObject object : avObjects) {
+                                int id = Math.abs(object.getObjectId().hashCode());
+                                Cursor c = RecordSQLManager.getInstance().selectRecordById(id);
+                                if (!c.moveToFirst()) {
+                                    String title = object.getString("title");
+                                    Date date = object.getDate("date");
+                                    String text = object.getString("text");
+                                    String suggestion = object.getString("suggestion");
+                                    int type = object.getInt("type");
+                                    RecordSQLManager.getInstance().insertRecord(id, title, date, text, suggestion, type);
+                                }
+                            }
+                            showToast(R.string.sync_success);
+                            refreshCalendar();
+                        } else {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }
 
-    @Override
-    public void onResume() {
-        super.onResume();
+            @Override
+            public void notLoggedIn() {
+                showToast(R.string.not_loggedin);
+            }
+
+            @Override
+            public void errorNetwork() {
+                showToast(R.string.network_error);
+            }
+
+            @Override
+            public void errorUsername() {
+                showToast(R.string.not_loggedin);
+            }
+
+            @Override
+            public void errorChecksum() {
+                showToast(R.string.not_loggedin);
+            }
+        });
+    }
+
+    private void refreshCalendar() {
         long ver = RecordSQLManager.getInstance().getVersion();
         if (ver != version) {
             List<String> flag = new ArrayList<>();
@@ -169,10 +232,13 @@ public class RecordFragment extends BaseFragment {
                 String title = RecordSQLManager.getTitle(latest);
                 String text = RecordSQLManager.getText(latest);
                 String suggestion = RecordSQLManager.getSuggestion(latest);
+                Date time = new Date(RecordSQLManager.getTime(latest));
+                DateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
                 titleView.setText(title);
                 textView.setText(text);
                 suggestionView.setText(suggestion);
+                timeView.setText(df.format(time));
                 int type = RecordSQLManager.getType(latest);
                 int bg = Color.GRAY;
                 switch (type) {
@@ -194,5 +260,12 @@ public class RecordFragment extends BaseFragment {
 
             version = ver;
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        refreshCalendar();
     }
 }
