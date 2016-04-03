@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
@@ -57,9 +58,15 @@ public class RecordFragment extends BaseFragment {
     CardView card;
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        syncFromCloud();
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_record, container, false);
         picker = (DatePicker) view.findViewById(R.id.date_picker);
 
@@ -125,7 +132,8 @@ public class RecordFragment extends BaseFragment {
         timeView = (TextView) view.findViewById(R.id.tv_time);
         card = (CardView) view.findViewById(R.id.record_card);
 
-        syncFromCloud();
+        updateData();
+        refreshCard();
 
         return view;
     }
@@ -153,7 +161,7 @@ public class RecordFragment extends BaseFragment {
                                 }
                             }
                             showToast(R.string.sync_success);
-                            refreshCalendar();
+                            updateData();
                         } else {
                             e.printStackTrace();
                         }
@@ -183,7 +191,7 @@ public class RecordFragment extends BaseFragment {
         });
     }
 
-    private void refreshCalendar() {
+    private void updateData() {
         long ver = RecordSQLManager.getInstance().getVersion();
         if (ver != version) {
             List<String> flag = new ArrayList<>();
@@ -221,38 +229,42 @@ public class RecordFragment extends BaseFragment {
 
             DPCManager.getInstance().setDecorBG(flag);
 
-            Cursor latest = RecordSQLManager.getInstance().getLatestRecord();
-            if (latest.moveToFirst()) {
-                String title = RecordSQLManager.getTitle(latest);
-                String text = RecordSQLManager.getText(latest);
-                String suggestion = RecordSQLManager.getSuggestion(latest);
-                Date time = new Date(RecordSQLManager.getTime(latest));
-                DateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-
-                titleView.setText(title);
-                textView.setText(text);
-                suggestionView.setText(suggestion);
-                timeView.setText(df.format(time));
-                int type = RecordSQLManager.getType(latest);
-                int bg = Color.GRAY;
-                switch (type) {
-                    case Constants.GOOD_TYPE:
-                        bg = Color.GREEN;
-                        break;
-                    case Constants.HIGH_TYPE:
-                        bg = Color.BLUE;
-                        break;
-                    case Constants.HIGHEST_TYPE:
-                        bg = Color.RED;
-                        break;
-                }
-                card.setCardBackgroundColor(bg);
-            } else {
-                titleView.setText(R.string.no_record);
-                card.setCardBackgroundColor(Color.GRAY);
-            }
+            refreshCard();
 
             version = ver;
+        }
+    }
+
+    private void refreshCard() {
+        Cursor latest = RecordSQLManager.getInstance().getLatestRecord();
+        if (latest.moveToFirst()) {
+            String title = RecordSQLManager.getTitle(latest);
+            String text = RecordSQLManager.getText(latest);
+            String suggestion = RecordSQLManager.getSuggestion(latest);
+            Date time = new Date(RecordSQLManager.getTime(latest));
+            DateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+
+            titleView.setText(title);
+            textView.setText(text);
+            suggestionView.setText(suggestion);
+            timeView.setText(df.format(time));
+            int type = RecordSQLManager.getType(latest);
+            int bg = Color.GRAY;
+            switch (type) {
+                case Constants.GOOD_TYPE:
+                    bg = Color.GREEN;
+                    break;
+                case Constants.HIGH_TYPE:
+                    bg = Color.BLUE;
+                    break;
+                case Constants.HIGHEST_TYPE:
+                    bg = Color.RED;
+                    break;
+            }
+            card.setCardBackgroundColor(bg);
+        } else {
+            titleView.setText(R.string.no_record);
+            card.setCardBackgroundColor(Color.GRAY);
         }
     }
 
@@ -260,6 +272,6 @@ public class RecordFragment extends BaseFragment {
     public void onResume() {
         super.onResume();
 
-        refreshCalendar();
+        updateData();
     }
 }
