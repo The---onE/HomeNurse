@@ -144,7 +144,7 @@ public class RecordFragment extends BaseFragment {
             public void success(AVObject user) {
                 AVQuery<AVObject> query = new AVQuery<>("Prescription");
                 query.whereEqualTo("patient", user.getObjectId());
-                query.whereEqualTo("status", 0);
+                query.whereEqualTo("status", Constants.STATUS_WAITING);
                 query.findInBackground(new FindCallback<AVObject>() {
                     public void done(List<AVObject> avObjects, AVException e) {
                         if (e == null) {
@@ -159,6 +159,8 @@ public class RecordFragment extends BaseFragment {
                                     int type = object.getInt("type");
                                     RecordSQLManager.getInstance().insertRecord(id, title, date, text, suggestion, type);
                                 }
+                                object.put("status", Constants.STATUS_COMPLETE);
+                                object.saveInBackground();
                             }
                             showToast(R.string.sync_success);
                             updateData();
