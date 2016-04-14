@@ -29,37 +29,6 @@ public class MainActivity extends BaseNavigationActivity {
     protected void initView(Bundle savedInstanceState) {
         setContentView(R.layout.activity_main);
 
-        UserManager.getInstance().autoLogin(new AutoLoginCallback() {
-            @Override
-            public void success(AVObject user) {
-            }
-
-            @Override
-            public void notLoggedIn() {
-                startActivity(LoginActivity.class);
-                finish();
-            }
-
-            @Override
-            public void errorNetwork() {
-                showToast(R.string.network_error);
-                startActivity(LoginActivity.class);
-                finish();
-            }
-
-            @Override
-            public void errorUsername() {
-                startActivity(LoginActivity.class);
-                finish();
-            }
-
-            @Override
-            public void errorChecksum() {
-                startActivity(LoginActivity.class);
-                finish();
-            }
-        });
-
         List<Fragment> fragments = new ArrayList<>();
         fragments.add(new HomeFragment());
         fragments.add(new RecordFragment());
