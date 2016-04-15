@@ -22,14 +22,16 @@
 
     <string name="login">登录</string>
     <string name="logout">注销</string>
+    <string name="nickname">昵称</string>
     <string name="nickname_hint">请输入昵称</string>
     <string name="nickname_empty">请输入昵称</string>
     <string name="username">帐号</string>
     <string name="username_hint">病案号/手机号</string>
     <string name="username_empty">请输入帐号</string>
     <string name="password">密码</string>
+    <string name="password_confirm">确认</string>
     <string name="password_hint">请输入登录密码</string>
-    <string name="password_confirm">请确认登录密码</string>
+    <string name="password_confirm_hint">请确认登录密码</string>
     <string name="password_different">两次输入密码不一致</string>
     <string name="password_empty">请输入密码</string>
     <string name="register">注册</string>
