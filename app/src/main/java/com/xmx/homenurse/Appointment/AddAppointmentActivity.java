@@ -10,11 +10,16 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.avos.avoscloud.AVException;
+import com.avos.avoscloud.AVObject;
+import com.avos.avoscloud.SaveCallback;
 import com.bigkoo.pickerview.OptionsPickerView;
 import com.bigkoo.pickerview.TimePickerView;
 import com.xmx.homenurse.Tools.ActivityBase.BaseTempActivity;
 import com.xmx.homenurse.Constants;
 import com.xmx.homenurse.R;
+import com.xmx.homenurse.User.Callback.AutoLoginCallback;
+import com.xmx.homenurse.User.UserManager;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -164,9 +169,56 @@ public class AddAppointmentActivity extends BaseTempActivity {
                 }
                 AppointmentSQLManager.getInstance()
                         .insertAppointment(appointmentTime, appointmentType, symptom, now);
-
+                pushToCloud(appointmentTime, appointmentType, symptom, now);
                 showToast(R.string.add_success);
                 finish();
+            }
+        });
+    }
+
+    private void pushToCloud(Date date, int type, String symptom, Date add) {
+        final AVObject post = new AVObject("Appointment");
+        post.put("time", date.getTime());
+        post.put("type", type);
+        post.put("symptom", symptom);
+        post.put("status", Constants.STATUS_WAITING);
+        post.put("addTime", add.getTime());
+
+        UserManager.getInstance().checkLogin(new AutoLoginCallback() {
+            @Override
+            public void success(AVObject user) {
+                post.put("patient", user.getObjectId());
+                post.saveInBackground(new SaveCallback() {
+                    @Override
+                    public void done(AVException e) {
+                        if (e == null) {
+                            showToast(R.string.save_success);
+                            finish();
+                        } else {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void notLoggedIn() {
+                showToast(R.string.not_loggedin);
+            }
+
+            @Override
+            public void errorNetwork() {
+                showToast(R.string.network_error);
+            }
+
+            @Override
+            public void errorUsername() {
+                showToast(R.string.not_loggedin);
+            }
+
+            @Override
+            public void errorChecksum() {
+                showToast(R.string.not_loggedin);
             }
         });
     }

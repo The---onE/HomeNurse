@@ -144,7 +144,7 @@ public class RecordFragment extends BaseFragment {
             public void success(AVObject user) {
                 AVQuery<AVObject> query = new AVQuery<>("Prescription");
                 query.whereEqualTo("patient", user.getObjectId());
-                query.whereEqualTo("status", Constants.STATUS_WAITING);
+                //query.whereEqualTo("status", Constants.STATUS_WAITING);
                 query.findInBackground(new FindCallback<AVObject>() {
                     public void done(List<AVObject> avObjects, AVException e) {
                         if (e == null) {
