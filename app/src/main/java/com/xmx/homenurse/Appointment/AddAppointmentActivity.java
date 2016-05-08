@@ -183,7 +183,8 @@ public class AddAppointmentActivity extends BaseTempActivity {
         UserManager.getInstance().checkLogin(new AutoLoginCallback() {
             @Override
             public void success(AVObject user) {
-                post.put("patient", user.getObjectId());
+                post.put("patient", user);
+                post.put("patientName", user.getString("nickname"));
                 post.saveInBackground(new SaveCallback() {
                     @Override
                     public void done(AVException e) {
