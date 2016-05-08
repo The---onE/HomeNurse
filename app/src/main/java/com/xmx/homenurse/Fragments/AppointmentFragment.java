@@ -1,6 +1,7 @@
 package com.xmx.homenurse.Fragments;
 
 import android.content.DialogInterface;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
@@ -11,6 +12,13 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.avos.avoscloud.AVException;
+import com.avos.avoscloud.AVObject;
+import com.avos.avoscloud.AVQuery;
+import com.avos.avoscloud.FindCallback;
+import com.avos.avoscloud.GetCallback;
+import com.avos.avoscloud.SaveCallback;
+import com.avos.avoscloud.okhttp.Call;
 import com.xmx.homenurse.Appointment.AddAppointmentActivity;
 import com.xmx.homenurse.Appointment.Appointment;
 import com.xmx.homenurse.Tools.BaseFragment;
@@ -19,6 +27,11 @@ import com.xmx.homenurse.Appointment.AppointmentManager;
 import com.xmx.homenurse.Appointment.AppointmentSQLManager;
 import com.xmx.homenurse.R;
 import com.xmx.homenurse.Appointment.AppointmentAdapter;
+import com.xmx.homenurse.Tools.Callback;
+import com.xmx.homenurse.User.Callback.AutoLoginCallback;
+import com.xmx.homenurse.User.UserManager;
+
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -58,8 +71,19 @@ public class AppointmentFragment extends BaseFragment {
                         builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                AppointmentSQLManager.getInstance().cancelAppointment(id);
-                                updateAppointmentList();
+                                Cursor c = AppointmentSQLManager.getInstance().selectAppointmentById(id);
+                                if (c.moveToFirst()) {
+                                    syncToCloud(AppointmentSQLManager.getCloudId(c),
+                                            Constants.STATUS_CANCELED,
+                                    new Callback() {
+                                        @Override
+                                        public void func() {
+                                            AppointmentSQLManager.getInstance().cancelAppointment(id);
+                                            showToast(R.string.sync_success);
+                                            updateAppointmentList();
+                                        }
+                                    });
+                                }
                             }
                         });
                         builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -76,8 +100,20 @@ public class AppointmentFragment extends BaseFragment {
                         builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                AppointmentSQLManager.getInstance().deleteAppointment(id);
-                                updateAppointmentList();
+                                Cursor c = AppointmentSQLManager.getInstance().selectAppointmentById(id);
+                                if (c.moveToFirst()) {
+                                    syncToCloud(AppointmentSQLManager.getCloudId(c),
+                                            Constants.STATUS_DELETED,
+                                            new Callback() {
+                                                @Override
+                                                public void func() {
+                                                    AppointmentSQLManager.getInstance()
+                                                            .deleteAppointment(id);
+                                                    showToast(R.string.sync_success);
+                                                    updateAppointmentList();
+                                                }
+                                            });
+                                }
                             }
                         });
                         builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -109,5 +145,51 @@ public class AppointmentFragment extends BaseFragment {
             version = ver;
         }
     }
+    void syncToCloud(final String id, final int status, final Callback callback) {
+        UserManager.getInstance().checkLogin(new AutoLoginCallback() {
+            @Override
+            public void success(AVObject user) {
+                AVQuery<AVObject> query = new AVQuery<>("Appointment");
+                query.getInBackground(id, new GetCallback<AVObject>() {
+                    public void done(AVObject post, AVException e) {
+                        if (e == null) {
+                            post.put("status", status);
+                            post.saveInBackground(new SaveCallback() {
+                                @Override
+                                public void done(AVException e) {
+                                    if (e == null) {
+                                        callback.func();
+                                    } else {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            });
+                        } else {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }
 
+            @Override
+            public void notLoggedIn() {
+                showToast(R.string.not_loggedin);
+            }
+
+            @Override
+            public void errorNetwork() {
+                showToast(R.string.network_error);
+            }
+
+            @Override
+            public void errorUsername() {
+                showToast(R.string.not_loggedin);
+            }
+
+            @Override
+            public void errorChecksum() {
+                showToast(R.string.not_loggedin);
+            }
+        });
+    }
 }

@@ -167,16 +167,12 @@ public class AddAppointmentActivity extends BaseTempActivity {
                     showToast(R.string.appointment_error);
                     return;
                 }
-                AppointmentSQLManager.getInstance()
-                        .insertAppointment(appointmentTime, appointmentType, symptom, now);
                 pushToCloud(appointmentTime, appointmentType, symptom, now);
-                showToast(R.string.add_success);
-                finish();
             }
         });
     }
 
-    private void pushToCloud(Date date, int type, String symptom, Date add) {
+    private void pushToCloud(final Date date, final int type, final String symptom, final Date add) {
         final AVObject post = new AVObject("Appointment");
         post.put("time", date.getTime());
         post.put("type", type);
@@ -192,7 +188,9 @@ public class AddAppointmentActivity extends BaseTempActivity {
                     @Override
                     public void done(AVException e) {
                         if (e == null) {
-                            showToast(R.string.save_success);
+                            AppointmentSQLManager.getInstance()
+                                    .insertAppointment(post.getObjectId(), appointmentTime, appointmentType, symptom, add);
+                            showToast(R.string.add_success);
                             finish();
                         } else {
                             e.printStackTrace();

@@ -15,6 +15,8 @@ import java.util.Date;
 public class AppointmentSQLManager extends BaseSQLManager {
     private static AppointmentSQLManager instance;
 
+    static final String TABLE_NAME = "APPOINTMENT";
+
     public synchronized static AppointmentSQLManager getInstance() {
         if (null == instance) {
             instance = new AppointmentSQLManager();
@@ -50,16 +52,21 @@ public class AppointmentSQLManager extends BaseSQLManager {
         return c.getLong(5);
     }
 
+    public static String getCloudId(Cursor c) {
+        return c.getString(6);
+    }
+
     protected boolean openDatabase() {
         SQLiteDatabase database = openSQLFile();
         if (database != null) {
-            String createAppointmentSQL = "create table if not exists APPOINTMENT(" +
+            String createAppointmentSQL = "create table if not exists "+TABLE_NAME+"(" +
                     "ID integer not null primary key autoincrement, " +
                     "TIME integer not null default(0), " +
                     "SYMPTOM text, " +
                     "STATUS integer default(0), " +
                     "TYPE integer default(0), " +
-                    "ADD_TIME integer not null default(0)" +
+                    "ADD_TIME integer not null default(0), " +
+                    "CLOUD_ID text" +
                     ")";
             database.execSQL(createAppointmentSQL);
             openFlag = true;
@@ -73,12 +80,12 @@ public class AppointmentSQLManager extends BaseSQLManager {
         if (!checkDatabase()) {
             return false;
         } else {
-            clearDatabase("APPOINTMENT");
+            clearDatabase(TABLE_NAME);
             return true;
         }
     }
 
-    public long insertAppointment(Date date, int type, String symptom, Date add) {
+    public long insertAppointment(String cloud, Date date, int type, String symptom, Date add) {
         if (!checkDatabase()) {
             return -1;
         }
@@ -88,19 +95,24 @@ public class AppointmentSQLManager extends BaseSQLManager {
         content.put("SYMPTOM", symptom);
         content.put("STATUS", Constants.STATUS_WAITING);
         content.put("ADD_TIME", add.getTime());
+        content.put("CLOUD_ID", cloud);
 
-        return insertData("APPOINTMENT", content);
+        return insertData(TABLE_NAME, content);
     }
 
     public void cancelAppointment(long id) {
-        updateDate("APPOINTMENT", id, "STATUS", "" + Constants.STATUS_CANCELED);
+        updateDate(TABLE_NAME, id, "STATUS", "" + Constants.STATUS_CANCELED);
     }
 
     public void deleteAppointment(long id) {
-        updateDate("APPOINTMENT", id, "STATUS", "" + Constants.STATUS_DELETED);
+        updateDate(TABLE_NAME, id, "STATUS", "" + Constants.STATUS_DELETED);
+    }
+
+    public Cursor selectAppointmentById(long id) {
+        return selectById(TABLE_NAME, id);
     }
 
     public Cursor selectAllAppointment() {
-        return selectAll("APPOINTMENT", "TIME", true);
+        return selectAll(TABLE_NAME, "TIME", true);
     }
 }
