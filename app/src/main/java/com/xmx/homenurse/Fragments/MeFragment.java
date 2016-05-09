@@ -11,7 +11,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
+import com.avos.avoscloud.AVQuery;
+import com.avos.avoscloud.FindCallback;
+import com.avos.avoscloud.SaveCallback;
 import com.bigkoo.pickerview.OptionsPickerView;
 import com.bigkoo.pickerview.TimePickerView;
 import com.xmx.homenurse.Tools.BaseFragment;
@@ -26,6 +30,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -270,6 +275,7 @@ public class MeFragment extends BaseFragment {
                     UserSQLManager.getInstance().insertUser(id, name, gen, birthday,
                             height, weight, idNumber, phone, email, address);
                 }
+                syncToCloud(name, gen, birthday, height, weight, idNumber, phone, email, address);
                 showToast(R.string.save_success);
                 nameView.setEnabled(false);
                 genderView.setEnabled(false);
@@ -315,5 +321,69 @@ public class MeFragment extends BaseFragment {
         });
 
         return true;
+    }
+
+    public void syncToCloud(final String name, final String gender, final Date birthday,
+                            final float height, final float weight,
+                            final String idNumber, final String phone, final String email,
+                            final String address) {
+        UserManager.getInstance().checkLogin(new AutoLoginCallback() {
+            @Override
+            public void success(final AVObject user) {
+                AVQuery<AVObject> query = new AVQuery<>("PatientsPersonal");
+                query.whereEqualTo("username", user.getString("username"));
+                query.findInBackground(new FindCallback<AVObject>() {
+                    @Override
+                    public void done(List<AVObject> list, AVException e) {
+                        AVObject post;
+                        if (list.size() > 0) {
+                            post = list.get(0);
+                        } else {
+                            post = new AVObject("PatientsPersonal");
+                        }
+                        post.put("username", user.getString("username"));
+                        post.put("name", name);
+                        post.put("gender", gender);
+                        post.put("birthday", birthday);
+                        post.put("height", height);
+                        post.put("weight", weight);
+                        post.put("idNumber", idNumber);
+                        post.put("phone", phone);
+                        post.put("email", email);
+                        post.put("address", address);
+                        post.saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(AVException e) {
+                                if (e == null) {
+                                    showToast(R.string.add_success);
+                                } else {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+
+            @Override
+            public void notLoggedIn() {
+                showToast(R.string.not_loggedin);
+            }
+
+            @Override
+            public void errorNetwork() {
+                showToast(R.string.network_error);
+            }
+
+            @Override
+            public void errorUsername() {
+                showToast(R.string.not_loggedin);
+            }
+
+            @Override
+            public void errorChecksum() {
+                showToast(R.string.not_loggedin);
+            }
+        });
     }
 }
