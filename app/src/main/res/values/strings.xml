@@ -61,6 +61,7 @@
     <string name="add">添加</string>
     <string name="add_success">添加成功</string>
     <string name="sync_success">同步完成</string>
+    <string name="sync_failure">同步完成</string>
 
     <string name="measure_data">测量数据</string>
 

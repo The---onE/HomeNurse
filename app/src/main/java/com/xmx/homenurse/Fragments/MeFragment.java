@@ -357,6 +357,7 @@ public class MeFragment extends BaseFragment {
                                 if (e == null) {
                                     showToast(R.string.add_success);
                                 } else {
+                                    showToast(R.string.sync_success);
                                     e.printStackTrace();
                                 }
                             }

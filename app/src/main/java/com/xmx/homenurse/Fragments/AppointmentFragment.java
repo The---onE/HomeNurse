@@ -109,7 +109,6 @@ public class AppointmentFragment extends BaseFragment {
                                                 public void func() {
                                                     AppointmentSQLManager.getInstance()
                                                             .deleteAppointment(id);
-                                                    showToast(R.string.sync_success);
                                                     updateAppointmentList();
                                                 }
                                             });
@@ -159,12 +158,15 @@ public class AppointmentFragment extends BaseFragment {
                                 public void done(AVException e) {
                                     if (e == null) {
                                         callback.func();
+                                        showToast(R.string.sync_success);
                                     } else {
+                                        showToast(R.string.sync_failure);
                                         e.printStackTrace();
                                     }
                                 }
                             });
                         } else {
+                            showToast(R.string.sync_failure);
                             e.printStackTrace();
                         }
                     }
