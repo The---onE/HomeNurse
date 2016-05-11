@@ -75,14 +75,14 @@ public class AppointmentFragment extends BaseFragment {
                                 if (c.moveToFirst()) {
                                     syncToCloud(AppointmentSQLManager.getCloudId(c),
                                             Constants.STATUS_CANCELED,
-                                    new Callback() {
-                                        @Override
-                                        public void func() {
-                                            AppointmentSQLManager.getInstance().cancelAppointment(id);
-                                            showToast(R.string.sync_success);
-                                            updateAppointmentList();
-                                        }
-                                    });
+                                            new Callback() {
+                                                @Override
+                                                public void func() {
+                                                    AppointmentSQLManager.getInstance().cancelAppointment(id);
+                                                    showToast(R.string.sync_success);
+                                                    updateAppointmentList();
+                                                }
+                                            });
                                 }
                             }
                         });
@@ -95,9 +95,9 @@ public class AppointmentFragment extends BaseFragment {
                         builder.show();
                         break;
                     case Constants.STATUS_CANCELED:
-                        builder.setMessage("要删除该记录吗？");
+                        builder.setMessage("要恢复该记录吗？");
                         builder.setTitle("提示");
-                        builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
+                        builder.setNegativeButton("删除", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 Cursor c = AppointmentSQLManager.getInstance().selectAppointmentById(id);
@@ -115,7 +115,25 @@ public class AppointmentFragment extends BaseFragment {
                                 }
                             }
                         });
-                        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                        builder.setPositiveButton("恢复", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                Cursor c = AppointmentSQLManager.getInstance().selectAppointmentById(id);
+                                if (c.moveToFirst()) {
+                                    syncToCloud(AppointmentSQLManager.getCloudId(c),
+                                            Constants.STATUS_WAITING,
+                                            new Callback() {
+                                                @Override
+                                                public void func() {
+                                                    AppointmentSQLManager.getInstance()
+                                                            .resumeAppointment(id);
+                                                    updateAppointmentList();
+                                                }
+                                            });
+                                }
+                            }
+                        });
+                        builder.setNeutralButton("取消", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 dialogInterface.dismiss();
@@ -144,6 +162,7 @@ public class AppointmentFragment extends BaseFragment {
             version = ver;
         }
     }
+
     void syncToCloud(final String id, final int status, final Callback callback) {
         UserManager.getInstance().checkLogin(new AutoLoginCallback() {
             @Override

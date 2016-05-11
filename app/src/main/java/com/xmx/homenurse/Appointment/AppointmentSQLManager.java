@@ -100,6 +100,10 @@ public class AppointmentSQLManager extends BaseSQLManager {
         return insertData(TABLE_NAME, content);
     }
 
+    public void resumeAppointment(long id) {
+        updateDate(TABLE_NAME, id, "STATUS", "" + Constants.STATUS_WAITING);
+    }
+
     public void cancelAppointment(long id) {
         updateDate(TABLE_NAME, id, "STATUS", "" + Constants.STATUS_CANCELED);
     }
