@@ -100,6 +100,22 @@ public class AppointmentSQLManager extends BaseSQLManager {
         return insertData(TABLE_NAME, content);
     }
 
+    public long insertAppointment(int id, String cloud, Date date, int type, String symptom, Date add) {
+        if (!checkDatabase()) {
+            return -1;
+        }
+        ContentValues content = new ContentValues();
+        content.put("ID", id);
+        content.put("TIME", date.getTime());
+        content.put("TYPE", type);
+        content.put("SYMPTOM", symptom);
+        content.put("STATUS", Constants.STATUS_WAITING);
+        content.put("ADD_TIME", add.getTime());
+        content.put("CLOUD_ID", cloud);
+
+        return insertData(TABLE_NAME, content);
+    }
+
     public void resumeAppointment(long id) {
         updateDate(TABLE_NAME, id, "STATUS", "" + Constants.STATUS_WAITING);
     }

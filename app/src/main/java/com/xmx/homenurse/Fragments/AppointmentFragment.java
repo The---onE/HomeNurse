@@ -3,6 +3,7 @@ package com.xmx.homenurse.Fragments;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
@@ -31,6 +32,7 @@ import com.xmx.homenurse.Tools.Callback;
 import com.xmx.homenurse.User.Callback.AutoLoginCallback;
 import com.xmx.homenurse.User.UserManager;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -39,6 +41,13 @@ import java.util.List;
 public class AppointmentFragment extends BaseFragment {
     long version;
     AppointmentAdapter adapter;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        syncFromCloud();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -57,7 +66,7 @@ public class AppointmentFragment extends BaseFragment {
         ListView appointmentList = (ListView) view.findViewById(R.id.list_appointment);
         adapter = new AppointmentAdapter(getContext());
         appointmentList.setAdapter(adapter);
-        updateAppointmentList();
+        syncFromCloud();
 
         appointmentList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
@@ -161,6 +170,62 @@ public class AppointmentFragment extends BaseFragment {
             adapter.changeList();
             version = ver;
         }
+    }
+
+    void syncFromCloud() {
+        UserManager.getInstance().checkLogin(new AutoLoginCallback() {
+            @Override
+            public void success(AVObject user) {
+                AVQuery<AVObject> query = new AVQuery<>("Appointment");
+                query.whereEqualTo("patient", user.getObjectId());
+                //query.whereEqualTo("status", Constants.STATUS_WAITING);
+                query.findInBackground(new FindCallback<AVObject>() {
+                    public void done(List<AVObject> avObjects, AVException e) {
+                        if (e == null) {
+                            for (AVObject object : avObjects) {
+                                int id = Math.abs(object.getObjectId().hashCode());
+                                Cursor c = AppointmentSQLManager.getInstance().selectAppointmentById(id);
+                                if (!c.moveToFirst()) {
+                                    String cloud = object.getObjectId();
+                                    Date date = object.getDate("time");
+                                    String symptom = object.getString("symptom");
+                                    Date add = object.getDate("addTime");
+                                    int type = object.getInt("type");
+                                    AppointmentSQLManager.getInstance().insertAppointment(id,
+                                            cloud, date, type, symptom, add);
+                                }
+                                //object.put("status", Constants.STATUS_COMPLETE);
+                                //object.saveInBackground();
+                            }
+                            showToast(R.string.sync_success);
+                            updateAppointmentList();
+                        } else {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void notLoggedIn() {
+                showToast(R.string.not_loggedin);
+            }
+
+            @Override
+            public void errorNetwork() {
+                showToast(R.string.network_error);
+            }
+
+            @Override
+            public void errorUsername() {
+                showToast(R.string.not_loggedin);
+            }
+
+            @Override
+            public void errorChecksum() {
+                showToast(R.string.not_loggedin);
+            }
+        });
     }
 
     void syncToCloud(final String id, final int status, final Callback callback) {
