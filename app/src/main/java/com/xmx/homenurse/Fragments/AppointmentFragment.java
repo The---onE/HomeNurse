@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -66,7 +67,6 @@ public class AppointmentFragment extends BaseFragment {
         ListView appointmentList = (ListView) view.findViewById(R.id.list_appointment);
         adapter = new AppointmentAdapter(getContext());
         appointmentList.setAdapter(adapter);
-        syncFromCloud();
 
         appointmentList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
@@ -177,7 +177,7 @@ public class AppointmentFragment extends BaseFragment {
             @Override
             public void success(AVObject user) {
                 AVQuery<AVObject> query = new AVQuery<>("Appointment");
-                query.whereEqualTo("patient", user.getObjectId());
+                query.whereEqualTo("patient", AVObject.createWithoutData("PatientsData", user.getObjectId()));
                 //query.whereEqualTo("status", Constants.STATUS_WAITING);
                 query.findInBackground(new FindCallback<AVObject>() {
                     public void done(List<AVObject> avObjects, AVException e) {
@@ -187,10 +187,11 @@ public class AppointmentFragment extends BaseFragment {
                                 Cursor c = AppointmentSQLManager.getInstance().selectAppointmentById(id);
                                 if (!c.moveToFirst()) {
                                     String cloud = object.getObjectId();
-                                    Date date = object.getDate("time");
+                                    Date date = new Date(object.getLong("time"));
                                     String symptom = object.getString("symptom");
-                                    Date add = object.getDate("addTime");
+                                    Date add = new Date(object.getLong("addTime"));
                                     int type = object.getInt("type");
+                                    Log.e(cloud, symptom);
                                     AppointmentSQLManager.getInstance().insertAppointment(id,
                                             cloud, date, type, symptom, add);
                                 }
