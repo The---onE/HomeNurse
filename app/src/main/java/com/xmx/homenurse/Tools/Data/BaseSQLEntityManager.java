@@ -10,13 +10,13 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class BaseSQLEntityManager {
+public abstract class BaseSQLEntityManager<Entity extends ISQLEntity> {
     private SQLiteDatabase database = null;
     long version = System.currentTimeMillis();
     protected boolean openFlag = false;
     protected String tableName = null;
 
-    ISQLEntity entityTemplate;
+    Entity entityTemplate;
 
     public long getVersion() {
         return version;
@@ -43,8 +43,8 @@ public abstract class BaseSQLEntityManager {
     protected boolean openDatabase() {
         openSQLFile();
         if (database != null) {
-            String createSQL = "create table if not exists "+ tableName +"("
-                    + entityTemplate.createTable() + ")";
+            String createSQL = "create table if not exists " + tableName + "("
+                    + entityTemplate.tableFields() + ")";
             database.execSQL(createSQL);
             openFlag = true;
         } else {
@@ -66,9 +66,9 @@ public abstract class BaseSQLEntityManager {
         version++;
     }
 
-    protected long insertData(ISQLEntity entity) {
+    protected long insertData(Entity entity) {
         version++;
-        return database.insert(tableName, null, entity.insertContent());
+        return database.insert(tableName, null, entity.getContent());
     }
 
     protected void updateDate(long id, String... strings) {
@@ -91,23 +91,23 @@ public abstract class BaseSQLEntityManager {
         version++;
     }
 
-    protected List<ISQLEntity>  convertToEntity(Cursor cursor) {
-        List<ISQLEntity> entities = new ArrayList<>();
+    protected List<Entity> convertToEntities(Cursor cursor) {
+        List<Entity> entities = new ArrayList<>();
         if (cursor.moveToFirst()) {
             do {
-                entities.add(entityTemplate.convert(cursor));
+                entities.add((Entity) entityTemplate.convertToEntity(cursor));
             } while (cursor.moveToNext());
         }
         cursor.close();
         return entities;
     }
 
-    protected List<ISQLEntity> selectAll() {
-        Cursor cursor =  database.rawQuery("select * from " + tableName, null);
-        return convertToEntity(cursor);
+    protected List<Entity> selectAll() {
+        Cursor cursor = database.rawQuery("select * from " + tableName, null);
+        return convertToEntities(cursor);
     }
 
-    protected List<ISQLEntity> selectAll(String order, boolean ascFlag) {
+    protected List<Entity> selectAll(String order, boolean ascFlag) {
         String asc;
         if (ascFlag) {
             asc = "asc";
@@ -115,21 +115,21 @@ public abstract class BaseSQLEntityManager {
             asc = "desc";
         }
         Cursor cursor = database.rawQuery("select * from " + tableName + " order by " + order + " " + asc, null);
-        return convertToEntity(cursor);
+        return convertToEntities(cursor);
     }
 
-    protected ISQLEntity selectById(long id) {
+    protected Entity selectById(long id) {
         Cursor cursor = database.rawQuery("select * from " + tableName + " where ID=" + id, null);
-        return entityTemplate.convert(cursor);
+        return (Entity) entityTemplate.convertToEntity(cursor);
     }
 
-    protected List<ISQLEntity> selectAmount(String data, String min, String max) {
+    protected List<Entity> selectAmount(String data, String min, String max) {
         Cursor cursor = database.rawQuery("select * from " + tableName + " where " + data +
                 " between " + min + " and " + max, null);
-        return convertToEntity(cursor);
+        return convertToEntities(cursor);
     }
 
-    protected ISQLEntity selectLatest(String order, boolean ascFlag, String... strings) {
+    protected Entity selectLatest(String order, boolean ascFlag, String... strings) {
         if (strings.length % 2 != 0) {
             return null;
         }
@@ -153,10 +153,10 @@ public abstract class BaseSQLEntityManager {
             asc = "desc";
         }
         Cursor cursor = database.rawQuery("select * from " + tableName + " " + content + " order by " + order + " " + asc + " limit " + 1, null);
-        return entityTemplate.convert(cursor);
+        return (Entity) entityTemplate.convertToEntity(cursor);
     }
 
-    protected List<ISQLEntity> selectByCondition(String order, String... strings) {
+    protected List<Entity> selectByCondition(String order, String... strings) {
         if (strings.length % 2 != 0) {
             return null;
         }
@@ -174,6 +174,6 @@ public abstract class BaseSQLEntityManager {
             content = "";
         }
         Cursor cursor = database.rawQuery("select * from " + tableName + " " + content + " order by " + order, null);
-        return convertToEntity(cursor);
+        return convertToEntities(cursor);
     }
 }
