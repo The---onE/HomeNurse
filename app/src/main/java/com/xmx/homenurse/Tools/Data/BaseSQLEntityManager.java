@@ -14,15 +14,16 @@ public abstract class BaseSQLEntityManager<Entity extends ISQLEntity> {
     private SQLiteDatabase database = null;
     long version = System.currentTimeMillis();
     protected boolean openFlag = false;
-    protected String tableName = null;
 
-    Entity entityTemplate;
+    //子类构造函数中初始化！初始化后再调用openDatabase方法
+    protected String tableName = null;
+    protected Entity entityTemplate;
 
     public long getVersion() {
         return version;
     }
 
-    protected void openSQLFile() {
+    private void openSQLFile() {
         String d = android.os.Environment.getExternalStorageDirectory() + Constants.DATABASE_DIR;
         File dir = new File(d);
         boolean flag = dir.exists() || dir.mkdirs();
@@ -57,7 +58,10 @@ public abstract class BaseSQLEntityManager<Entity extends ISQLEntity> {
         return (openFlag || openDatabase()) && (tableName != null);
     }
 
-    protected void clearDatabase() {
+    public void clearDatabase() {
+        if (!checkDatabase()) {
+            return;
+        }
         String clear = "delete from " + tableName;
         database.execSQL(clear);
         String zero = "delete from sqlite_sequence where NAME = '" + tableName + "'";
@@ -66,12 +70,12 @@ public abstract class BaseSQLEntityManager<Entity extends ISQLEntity> {
         version++;
     }
 
-    protected long insertData(Entity entity) {
+    public long insertData(Entity entity) {
         version++;
         return database.insert(tableName, null, entity.getContent());
     }
 
-    protected void updateDate(long id, String... strings) {
+    public void updateDate(long id, String... strings) {
         String content;
         if (strings.length > 0) {
             content = "set ";
@@ -91,7 +95,7 @@ public abstract class BaseSQLEntityManager<Entity extends ISQLEntity> {
         version++;
     }
 
-    protected List<Entity> convertToEntities(Cursor cursor) {
+    private List<Entity> convertToEntities(Cursor cursor) {
         List<Entity> entities = new ArrayList<>();
         if (cursor.moveToFirst()) {
             do {
@@ -102,12 +106,12 @@ public abstract class BaseSQLEntityManager<Entity extends ISQLEntity> {
         return entities;
     }
 
-    protected List<Entity> selectAll() {
+    public List<Entity> selectAll() {
         Cursor cursor = database.rawQuery("select * from " + tableName, null);
         return convertToEntities(cursor);
     }
 
-    protected List<Entity> selectAll(String order, boolean ascFlag) {
+    public List<Entity> selectAll(String order, boolean ascFlag) {
         String asc;
         if (ascFlag) {
             asc = "asc";
@@ -118,18 +122,18 @@ public abstract class BaseSQLEntityManager<Entity extends ISQLEntity> {
         return convertToEntities(cursor);
     }
 
-    protected Entity selectById(long id) {
+    public Entity selectById(long id) {
         Cursor cursor = database.rawQuery("select * from " + tableName + " where ID=" + id, null);
         return (Entity) entityTemplate.convertToEntity(cursor);
     }
 
-    protected List<Entity> selectAmount(String data, String min, String max) {
+    public List<Entity> selectAmount(String data, String min, String max) {
         Cursor cursor = database.rawQuery("select * from " + tableName + " where " + data +
                 " between " + min + " and " + max, null);
         return convertToEntities(cursor);
     }
 
-    protected Entity selectLatest(String order, boolean ascFlag, String... strings) {
+    public Entity selectLatest(String order, boolean ascFlag, String... strings) {
         if (strings.length % 2 != 0) {
             return null;
         }
@@ -156,7 +160,7 @@ public abstract class BaseSQLEntityManager<Entity extends ISQLEntity> {
         return (Entity) entityTemplate.convertToEntity(cursor);
     }
 
-    protected List<Entity> selectByCondition(String order, String... strings) {
+    public List<Entity> selectByCondition(String order, String... strings) {
         if (strings.length % 2 != 0) {
             return null;
         }
