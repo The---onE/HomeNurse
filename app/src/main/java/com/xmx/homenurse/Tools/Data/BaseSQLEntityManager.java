@@ -71,11 +71,17 @@ public abstract class BaseSQLEntityManager<Entity extends ISQLEntity> {
     }
 
     public long insertData(Entity entity) {
+        if (!checkDatabase()) {
+            return -1;
+        }
         version++;
         return database.insert(tableName, null, entity.getContent());
     }
 
     public void updateDate(long id, String... strings) {
+        if (!checkDatabase()) {
+            return;
+        }
         String content;
         if (strings.length > 0) {
             content = "set ";
@@ -96,6 +102,9 @@ public abstract class BaseSQLEntityManager<Entity extends ISQLEntity> {
     }
 
     private List<Entity> convertToEntities(Cursor cursor) {
+        if (!checkDatabase()) {
+            return null;
+        }
         List<Entity> entities = new ArrayList<>();
         if (cursor.moveToFirst()) {
             do {
@@ -106,12 +115,29 @@ public abstract class BaseSQLEntityManager<Entity extends ISQLEntity> {
         return entities;
     }
 
+    private Entity convertToEntity(Cursor cursor) {
+        if (!checkDatabase()) {
+            return null;
+        }
+        if (cursor.moveToFirst()) {
+            return (Entity) entityTemplate.convertToEntity(cursor);
+        } else {
+            return null;
+        }
+    }
+
     public List<Entity> selectAll() {
+        if (!checkDatabase()) {
+            return null;
+        }
         Cursor cursor = database.rawQuery("select * from " + tableName, null);
         return convertToEntities(cursor);
     }
 
     public List<Entity> selectAll(String order, boolean ascFlag) {
+        if (!checkDatabase()) {
+            return null;
+        }
         String asc;
         if (ascFlag) {
             asc = "asc";
@@ -123,17 +149,26 @@ public abstract class BaseSQLEntityManager<Entity extends ISQLEntity> {
     }
 
     public Entity selectById(long id) {
+        if (!checkDatabase()) {
+            return null;
+        }
         Cursor cursor = database.rawQuery("select * from " + tableName + " where ID=" + id, null);
-        return (Entity) entityTemplate.convertToEntity(cursor);
+        return convertToEntity(cursor);
     }
 
     public List<Entity> selectAmount(String data, String min, String max) {
+        if (!checkDatabase()) {
+            return null;
+        }
         Cursor cursor = database.rawQuery("select * from " + tableName + " where " + data +
                 " between " + min + " and " + max, null);
         return convertToEntities(cursor);
     }
 
     public Entity selectLatest(String order, boolean ascFlag, String... strings) {
+        if (!checkDatabase()) {
+            return null;
+        }
         if (strings.length % 2 != 0) {
             return null;
         }
@@ -157,10 +192,13 @@ public abstract class BaseSQLEntityManager<Entity extends ISQLEntity> {
             asc = "desc";
         }
         Cursor cursor = database.rawQuery("select * from " + tableName + " " + content + " order by " + order + " " + asc + " limit " + 1, null);
-        return (Entity) entityTemplate.convertToEntity(cursor);
+        return convertToEntity(cursor);
     }
 
     public List<Entity> selectByCondition(String order, String... strings) {
+        if (!checkDatabase()) {
+            return null;
+        }
         if (strings.length % 2 != 0) {
             return null;
         }
