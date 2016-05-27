@@ -73,21 +73,22 @@ public class AppointmentFragment extends BaseFragment {
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, final long id) {
                 Appointment appointment = (Appointment) adapter.getItem(i);
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                switch (appointment.getStatus()) {
+                switch (appointment.mStatus) {
                     case Constants.STATUS_WAITING:
                         builder.setMessage("要取消预约吗？");
                         builder.setTitle("提示");
                         builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                Cursor c = AppointmentSQLManager.getInstance().selectAppointmentById(id);
-                                if (c.moveToFirst()) {
-                                    syncToCloud(AppointmentSQLManager.getCloudId(c),
+                                Appointment c = AppointmentSQLManager.getInstance().selectById(id);
+                                if (c != null) {
+                                    syncToCloud(c.mCloudId,
                                             Constants.STATUS_CANCELED,
                                             new Callback() {
                                                 @Override
                                                 public void func() {
-                                                    AppointmentSQLManager.getInstance().cancelAppointment(id);
+                                                    AppointmentSQLManager.getInstance()
+                                                            .cancelAppointment(id);
                                                     showToast(R.string.sync_success);
                                                     updateAppointmentList();
                                                 }
@@ -109,9 +110,9 @@ public class AppointmentFragment extends BaseFragment {
                         builder.setNegativeButton("删除", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                Cursor c = AppointmentSQLManager.getInstance().selectAppointmentById(id);
-                                if (c.moveToFirst()) {
-                                    syncToCloud(AppointmentSQLManager.getCloudId(c),
+                                Appointment c = AppointmentSQLManager.getInstance().selectById(id);
+                                if (c != null) {
+                                    syncToCloud(c.mCloudId,
                                             Constants.STATUS_DELETED,
                                             new Callback() {
                                                 @Override
@@ -127,9 +128,9 @@ public class AppointmentFragment extends BaseFragment {
                         builder.setPositiveButton("恢复", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                Cursor c = AppointmentSQLManager.getInstance().selectAppointmentById(id);
-                                if (c.moveToFirst()) {
-                                    syncToCloud(AppointmentSQLManager.getCloudId(c),
+                                Appointment c = AppointmentSQLManager.getInstance().selectById(id);
+                                if (c != null) {
+                                    syncToCloud(c.mCloudId,
                                             Constants.STATUS_WAITING,
                                             new Callback() {
                                                 @Override
@@ -183,17 +184,18 @@ public class AppointmentFragment extends BaseFragment {
                     public void done(List<AVObject> avObjects, AVException e) {
                         if (e == null) {
                             for (AVObject object : avObjects) {
-                                int id = Math.abs(object.getObjectId().hashCode());
-                                Cursor c = AppointmentSQLManager.getInstance().selectAppointmentById(id);
-                                if (!c.moveToFirst()) {
+                                long id = Math.abs(object.getObjectId().hashCode());
+                                Appointment c = AppointmentSQLManager.getInstance()
+                                        .selectByCloudId(object.getObjectId());
+                                if (c == null) {
                                     String cloud = object.getObjectId();
                                     Date date = new Date(object.getLong("time"));
                                     String symptom = object.getString("symptom");
                                     Date add = new Date(object.getLong("addTime"));
                                     int type = object.getInt("type");
-                                    Log.e(cloud, symptom);
-                                    AppointmentSQLManager.getInstance().insertAppointment(id,
+                                    Appointment appointment = new Appointment(id,
                                             cloud, date, type, symptom, add);
+                                    AppointmentSQLManager.getInstance().insertData(appointment);
                                 }
                                 //object.put("status", Constants.STATUS_COMPLETE);
                                 //object.saveInBackground();

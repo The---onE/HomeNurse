@@ -15,10 +15,11 @@ public abstract class BaseSQLEntityManager<Entity extends ISQLEntity> {
     long version = System.currentTimeMillis();
     protected boolean openFlag = false;
 
-    //子类构造函数中初始化！初始化后再调用openDatabase方法
+    //子类构造函数中初始化下列变量！初始化后再调用openDatabase方法
     protected String tableName = null;
-    protected Entity entityTemplate;
+    protected Entity entityTemplate = null; //空模版，不需要数据
 
+    //数据变更时会更新版本
     public long getVersion() {
         return version;
     }
@@ -43,7 +44,7 @@ public abstract class BaseSQLEntityManager<Entity extends ISQLEntity> {
 
     protected boolean openDatabase() {
         openSQLFile();
-        if (database != null) {
+        if (database != null && tableName != null && entityTemplate != null) {
             String createSQL = "create table if not exists " + tableName + "("
                     + entityTemplate.tableFields() + ")";
             database.execSQL(createSQL);
@@ -55,9 +56,10 @@ public abstract class BaseSQLEntityManager<Entity extends ISQLEntity> {
     }
 
     protected boolean checkDatabase() {
-        return (openFlag || openDatabase()) && (tableName != null);
+        return openFlag || openDatabase();
     }
 
+    //清空数据表
     public void clearDatabase() {
         if (!checkDatabase()) {
             return;
@@ -70,6 +72,7 @@ public abstract class BaseSQLEntityManager<Entity extends ISQLEntity> {
         version++;
     }
 
+    //插入实体数据
     public long insertData(Entity entity) {
         if (!checkDatabase()) {
             return -1;
@@ -78,6 +81,7 @@ public abstract class BaseSQLEntityManager<Entity extends ISQLEntity> {
         return database.insert(tableName, null, entity.getContent());
     }
 
+    //更新数据 updateDate(id, "KEY1=Value1", "KEY2=Value2")
     public void updateDate(long id, String... strings) {
         if (!checkDatabase()) {
             return;
@@ -86,11 +90,9 @@ public abstract class BaseSQLEntityManager<Entity extends ISQLEntity> {
         if (strings.length > 0) {
             content = "set ";
             int i = 0;
-            content += strings[i] + " = ";
-            content += strings[++i] + " ";
+            content += strings[i] + " ";
             for (i++; i < strings.length; ++i) {
-                content += ", " + strings[i] + " = ";
-                content += strings[++i] + " ";
+                content += ", " + strings[i] + " ";
             }
         } else {
             content = "";
@@ -126,6 +128,7 @@ public abstract class BaseSQLEntityManager<Entity extends ISQLEntity> {
         }
     }
 
+    //查询全部数据
     public List<Entity> selectAll() {
         if (!checkDatabase()) {
             return null;
@@ -134,6 +137,7 @@ public abstract class BaseSQLEntityManager<Entity extends ISQLEntity> {
         return convertToEntities(cursor);
     }
 
+    //查询全部数据并排序, ascFlag为true升序，为false降序
     public List<Entity> selectAll(String order, boolean ascFlag) {
         if (!checkDatabase()) {
             return null;
@@ -148,6 +152,7 @@ public abstract class BaseSQLEntityManager<Entity extends ISQLEntity> {
         return convertToEntities(cursor);
     }
 
+    //通过ID查询数据，需要ID字段
     public Entity selectById(long id) {
         if (!checkDatabase()) {
             return null;
@@ -156,6 +161,17 @@ public abstract class BaseSQLEntityManager<Entity extends ISQLEntity> {
         return convertToEntity(cursor);
     }
 
+    //通过云ID查询数据，需要CLOUD_ID字段
+    public Entity selectByCloudId(String cloudId) {
+        if (!checkDatabase()) {
+            return null;
+        }
+        Cursor cursor = database.rawQuery("select * from " + tableName
+                + " where CLOUD_ID='" + cloudId + "'", null);
+        return convertToEntity(cursor);
+    }
+
+    //查询值在范围内的数据
     public List<Entity> selectAmount(String data, String min, String max) {
         if (!checkDatabase()) {
             return null;
@@ -165,22 +181,18 @@ public abstract class BaseSQLEntityManager<Entity extends ISQLEntity> {
         return convertToEntities(cursor);
     }
 
+    //查询最新数据 selectLatest("TIME", true为升序/false为降序, "KEY1=Value1", "KEY2!=Value2")
     public Entity selectLatest(String order, boolean ascFlag, String... strings) {
         if (!checkDatabase()) {
-            return null;
-        }
-        if (strings.length % 2 != 0) {
             return null;
         }
         String content;
         if (strings.length > 0) {
             content = "where ";
             int i = 0;
-            content += strings[i] + " = ";
-            content += strings[++i] + " ";
+            content += strings[i] + " ";
             for (i++; i < strings.length; ++i) {
-                content += "and " + strings[i] + " = ";
-                content += strings[++i] + " ";
+                content += "and " + strings[i] + " ";
             }
         } else {
             content = "";
@@ -195,27 +207,29 @@ public abstract class BaseSQLEntityManager<Entity extends ISQLEntity> {
         return convertToEntity(cursor);
     }
 
-    public List<Entity> selectByCondition(String order, String... strings) {
+    //根据条件查询数据 selectByCondition("TIME", true为升序/false为降序, "KEY1=Value1", "KEY2!=Value2")
+    public List<Entity> selectByCondition(String order, boolean ascFlag, String... strings) {
         if (!checkDatabase()) {
             return null;
         }
-        if (strings.length % 2 != 0) {
-            return null;
+        String asc;
+        if (ascFlag) {
+            asc = "asc";
+        } else {
+            asc = "desc";
         }
         String content;
         if (strings.length > 0) {
             content = "where ";
             int i = 0;
-            content += strings[i] + " = ";
-            content += strings[++i] + " ";
+            content += strings[i] + " ";
             for (i++; i < strings.length; ++i) {
-                content += "and " + strings[i] + " = ";
-                content += strings[++i] + " ";
+                content += "and " + strings[i] + " ";
             }
         } else {
             content = "";
         }
-        Cursor cursor = database.rawQuery("select * from " + tableName + " " + content + " order by " + order, null);
+        Cursor cursor = database.rawQuery("select * from " + tableName + " " + content + " order by " + order + " " + asc, null);
         return convertToEntities(cursor);
     }
 }

@@ -189,8 +189,11 @@ public class AddAppointmentActivity extends BaseTempActivity {
                     @Override
                     public void done(AVException e) {
                         if (e == null) {
+                            Appointment appointment = new Appointment(post.getObjectId(),
+                                    appointmentTime, appointmentType, symptom, add);
+
                             AppointmentSQLManager.getInstance()
-                                    .insertAppointment(post.getObjectId(), appointmentTime, appointmentType, symptom, add);
+                                    .insertData(appointment);
                             showToast(R.string.add_success);
                             finish();
                         } else {

@@ -1,11 +1,8 @@
 package com.xmx.homenurse.Appointment;
 
-import android.database.Cursor;
-
 import com.xmx.homenurse.Constants;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -36,24 +33,10 @@ public class AppointmentManager {
         if (sqlManager.getVersion() != sqlVersion) {
             sqlVersion = sqlManager.getVersion();
 
-            Cursor c = sqlManager.selectAllAppointment();
             appointments.clear();
-            if (c.moveToFirst()) {
-                do {
-                    int status = AppointmentSQLManager.getStatus(c);
-                    if (status != Constants.STATUS_DELETED) {
-                        long id = AppointmentSQLManager.getId(c);
-                        long time = AppointmentSQLManager.getTime(c);
-                        int type = AppointmentSQLManager.getType(c);
-                        String symptom = AppointmentSQLManager.getSymptom(c);
-                        long addTime = AppointmentSQLManager.getAddTime(c);
+            appointments = sqlManager.selectByCondition("TIME", true, "STATUS !="
+                    + Constants.STATUS_DELETED);
 
-                        Appointment a = new Appointment(id, new Date(time), type, symptom,
-                                new Date(addTime), status);
-                        appointments.add(a);
-                    }
-                } while (c.moveToNext());
-            }
             changeFlag = true;
         }
 

@@ -47,7 +47,7 @@ public class AppointmentAdapter extends BaseAdapter {
     @Override
     public long getItemId(int i) {
         if (i < AppointmentManager.getInstance().getAppointments().size()) {
-            return AppointmentManager.getInstance().getAppointments().get(i).getId();
+            return AppointmentManager.getInstance().getAppointments().get(i).mId;
         } else {
             return i;
         }
@@ -82,14 +82,14 @@ public class AppointmentAdapter extends BaseAdapter {
         if (position < appointments.size()) {
             Appointment appointment = appointments.get(position);
             DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            String timeString = df.format(appointment.getTime());
+            String timeString = df.format(appointment.mTime);
             holder.time.setText(timeString);
-            holder.type.setText(Constants.APPOINTMENT_TYPE[appointment.getType()]);
-            holder.symptom.setText(appointment.getSymptom());
-            String addTimeString = df.format(appointment.getAddTime());
+            holder.type.setText(Constants.APPOINTMENT_TYPE[appointment.mType]);
+            holder.symptom.setText(appointment.mSymptom);
+            String addTimeString = df.format(appointment.mAddTime);
             holder.addTime.setText(addTimeString);
 
-            switch (appointment.getStatus()) {
+            switch (appointment.mStatus) {
                 case Constants.STATUS_CANCELED:
                     holder.card.setCardBackgroundColor(Color.GRAY);
                     break;
