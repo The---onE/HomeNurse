@@ -19,6 +19,7 @@ import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
 import com.avos.avoscloud.AVQuery;
 import com.avos.avoscloud.FindCallback;
+import com.xmx.homenurse.Record.Record;
 import com.xmx.homenurse.Record.RecordAmountADayActivity;
 import com.xmx.homenurse.Tools.BaseFragment;
 import com.xmx.homenurse.Constants;
@@ -150,14 +151,15 @@ public class RecordFragment extends BaseFragment {
                         if (e == null) {
                             for (AVObject object : avObjects) {
                                 int id = Math.abs(object.getObjectId().hashCode());
-                                Cursor c = RecordSQLManager.getInstance().selectRecordById(id);
-                                if (!c.moveToFirst()) {
+                                Record c = RecordSQLManager.getInstance().selectById(id);
+                                if (c == null) {
                                     String title = object.getString("title");
-                                    Date date = object.getDate("date");
+                                    long time = object.getDate("date").getTime();
                                     String text = object.getString("text");
                                     String suggestion = object.getString("suggestion");
                                     int type = object.getInt("type");
-                                    RecordSQLManager.getInstance().insertRecord(id, title, date, text, suggestion, type);
+                                    Record record = new Record(id, title, time, text, suggestion, 0, type);
+                                    RecordSQLManager.getInstance().insertData(record);
                                 }
                                 object.put("status", Constants.STATUS_COMPLETE);
                                 object.saveInBackground();
@@ -198,28 +200,26 @@ public class RecordFragment extends BaseFragment {
         if (ver != version) {
             List<String> flag = new ArrayList<>();
 
-            Cursor c = RecordSQLManager.getInstance().selectAllRecord();
+            List<Record> records = RecordSQLManager.getInstance().selectAll();
             dates.clear();
-            if (c.moveToFirst()) {
-                do {
-                    long time = RecordSQLManager.getTime(c);
-                    Date temp = new Date(time);
+            for (Record record: records) {
+                long time = record.mTime;
+                Date temp = new Date(time);
 
-                    Date date = new Date(0);
-                    date.setYear(temp.getYear());
-                    date.setMonth(temp.getMonth());
-                    date.setDate(temp.getDate());
-                    long t = date.getTime();
-                    int type = RecordSQLManager.getType(c);
-                    if (!dates.containsKey(t)) {
+                Date date = new Date(0);
+                date.setYear(temp.getYear());
+                date.setMonth(temp.getMonth());
+                date.setDate(temp.getDate());
+                long t = date.getTime();
+                int type = record.mType;
+                if (!dates.containsKey(t)) {
+                    dates.put(t, type);
+                } else {
+                    int old = dates.get(t);
+                    if (old < type) {
                         dates.put(t, type);
-                    } else {
-                        int old = dates.get(t);
-                        if (old < type) {
-                            dates.put(t, type);
-                        }
                     }
-                } while (c.moveToNext());
+                }
             }
 
             for (Map.Entry<Long, Integer> entry : dates.entrySet()) {
@@ -238,19 +238,19 @@ public class RecordFragment extends BaseFragment {
     }
 
     private void refreshCard() {
-        Cursor latest = RecordSQLManager.getInstance().getLatestRecord();
-        if (latest.moveToFirst()) {
-            String title = RecordSQLManager.getTitle(latest);
-            String text = RecordSQLManager.getText(latest);
-            String suggestion = RecordSQLManager.getSuggestion(latest);
-            Date time = new Date(RecordSQLManager.getTime(latest));
+        Record latest = RecordSQLManager.getInstance().selectLatest("TIME", false);
+        if (latest != null) {
+            String title = latest.mTitle;
+            String text = latest.mText;
+            String suggestion = latest.mSuggestion;
+            Date time = new Date(latest.mTime);
             DateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
             titleView.setText(title);
             textView.setText(text);
             suggestionView.setText(suggestion);
             timeView.setText(df.format(time));
-            int type = RecordSQLManager.getType(latest);
+            int type = latest.mType;
             int bg = Color.GRAY;
             switch (type) {
                 case Constants.GOOD_TYPE:

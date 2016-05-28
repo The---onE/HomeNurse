@@ -42,7 +42,7 @@ public class RecordAdapter extends BaseAdapter {
 
     @Override
     public long getItemId(int i) {
-        return mRecords.get(i).getId();
+        return mRecords.get(i).mId;
     }
 
     static class ViewHolder {
@@ -71,17 +71,17 @@ public class RecordAdapter extends BaseAdapter {
 
         if (position < mRecords.size()) {
             Record record = mRecords.get(position);
-            String title = record.getTitle();
-            String text = record.getText();
-            String suggestion = record.getSuggestion();
-            Date time = record.getTime();
+            String title = record.mTitle;
+            String text = record.mText;
+            String suggestion = record.mSuggestion;
+            Date time = new Date(record.mTime);
             DateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
             holder.title.setText(title);
             holder.text.setText(text);
             holder.suggestion.setText(suggestion);
             holder.time.setText(df.format(time));
-            int type = record.getType();
+            int type = record.mType;
             int bg = Color.GRAY;
             switch (type) {
                 case Constants.GOOD_TYPE:

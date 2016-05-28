@@ -1,14 +1,7 @@
 package com.xmx.homenurse.Appointment;
 
-import android.content.ContentValues;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-
 import com.xmx.homenurse.Constants;
 import com.xmx.homenurse.Tools.Data.BaseSQLEntityManager;
-import com.xmx.homenurse.Tools.Data.BaseSQLManager;
-
-import java.util.Date;
 
 /**
  * Created by The_onE on 2016/3/27.

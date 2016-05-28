@@ -116,7 +116,9 @@ public class AddRecordActivity extends BaseTempActivity {
                 EditText suggestionView = getViewById(R.id.suggestion);
                 String suggestion = suggestionView.getText().toString();
 
-                RecordSQLManager.getInstance().insertRecord(title, recordDate, text, suggestion, recordType);
+                Record record = new Record(-1, title, recordDate.getTime(), text, suggestion, 0, recordType);
+
+                RecordSQLManager.getInstance().insertData(record);
                 pushToCloud(title, recordDate, text, suggestion, recordType);
                 showToast("记录成功");
                 finish();

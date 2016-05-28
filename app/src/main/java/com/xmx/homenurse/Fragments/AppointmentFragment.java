@@ -1,12 +1,10 @@
 package com.xmx.homenurse.Fragments;
 
 import android.content.DialogInterface;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +18,6 @@ import com.avos.avoscloud.AVQuery;
 import com.avos.avoscloud.FindCallback;
 import com.avos.avoscloud.GetCallback;
 import com.avos.avoscloud.SaveCallback;
-import com.avos.avoscloud.okhttp.Call;
 import com.xmx.homenurse.Appointment.AddAppointmentActivity;
 import com.xmx.homenurse.Appointment.Appointment;
 import com.xmx.homenurse.Tools.BaseFragment;
