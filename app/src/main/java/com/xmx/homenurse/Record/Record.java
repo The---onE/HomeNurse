@@ -3,12 +3,17 @@ package com.xmx.homenurse.Record;
 import android.content.ContentValues;
 import android.database.Cursor;
 
+import com.avos.avoscloud.AVObject;
+import com.xmx.homenurse.Constants;
+import com.xmx.homenurse.Tools.Data.Cloud.ICloudEntity;
 import com.xmx.homenurse.Tools.Data.ISQLEntity;
+
+import java.util.Date;
 
 /**
  * Created by The_onE on 2016/4/2.
  */
-public class Record implements ISQLEntity {
+public class Record implements ISQLEntity, ICloudEntity {
     public long mId = -1;
     public String mTitle;
     public long mTime;
@@ -71,5 +76,34 @@ public class Record implements ISQLEntity {
         record.mType = c.getInt(6);
         record.mCloudId = c.getString(7);
         return record;
+    }
+
+    public AVObject getContent(String tableName) {
+        AVObject object = new AVObject(tableName);
+        object.put("title", mTitle);
+        object.put("date", new Date(mTime));
+        object.put("text", mText);
+        object.put("suggestion", mSuggestion);
+        object.put("type", mType);
+        object.put("status", mStatus);
+        return object;
+    }
+
+    @Override
+    public Record convertToEntity(AVObject object) {
+        int id = Math.abs(object.getObjectId().hashCode());
+        Record c = RecordSQLManager.getInstance().selectById(id);
+        if (c == null) {
+            String title = object.getString("title");
+            long time = object.getDate("date").getTime();
+            String text = object.getString("text");
+            String suggestion = object.getString("suggestion");
+            int type = object.getInt("type");
+            c = new Record(id, title, time, text, suggestion, 0, type);
+        }
+        c.mCloudId = object.getObjectId();
+        object.put("status", Constants.STATUS_COMPLETE);
+        object.saveInBackground();
+        return c;
     }
 }
