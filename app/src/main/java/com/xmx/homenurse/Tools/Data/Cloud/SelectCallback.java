@@ -1,5 +1,7 @@
 package com.xmx.homenurse.Tools.Data.Cloud;
 
+import com.avos.avoscloud.AVException;
+
 import java.util.List;
 
 /**
@@ -10,6 +12,8 @@ public abstract class SelectCallback<Entity extends ICloudEntity> {
     public abstract void success(List<Entity> entities);
 
     public abstract void notInit();
+
+    public abstract void syncError(AVException e);
 
     public abstract void notLoggedIn();
 

@@ -2,14 +2,12 @@ package com.xmx.homenurse.Tools.Data.Cloud;
 
 import com.avos.avoscloud.AVException;
 
-import java.util.List;
-
 /**
  * Created by The_onE on 2016/5/29.
  */
-public abstract class InsertCallback {
+public abstract class UpdateCallback {
 
-    public abstract void success(String objectId);
+    public abstract void success();
 
     public abstract void notInit();
 

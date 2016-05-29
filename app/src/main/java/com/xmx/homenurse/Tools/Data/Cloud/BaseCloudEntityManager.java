@@ -6,7 +6,9 @@ import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
 import com.avos.avoscloud.AVQuery;
 import com.avos.avoscloud.FindCallback;
+import com.avos.avoscloud.GetCallback;
 import com.avos.avoscloud.SaveCallback;
+import com.xmx.homenurse.Tools.PagerAdapter;
 import com.xmx.homenurse.User.Callback.AutoLoginCallback;
 import com.xmx.homenurse.User.UserManager;
 
@@ -56,7 +58,7 @@ public abstract class BaseCloudEntityManager<Entity extends ICloudEntity> {
                             }
                             callback.success(entities);
                         } else {
-                            e.printStackTrace();
+                            callback.syncError(e);
                         }
                     }
                 });
@@ -102,7 +104,65 @@ public abstract class BaseCloudEntityManager<Entity extends ICloudEntity> {
                         if (e == null) {
                             callback.success(object.getObjectId());
                         } else {
-                            e.printStackTrace();
+                            callback.syncError(e);
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void notLoggedIn() {
+                callback.notLoggedIn();
+            }
+
+            @Override
+            public void errorNetwork() {
+                callback.errorNetwork();
+            }
+
+            @Override
+            public void errorUsername() {
+                callback.errorUsername();
+            }
+
+            @Override
+            public void errorChecksum() {
+                callback.errorChecksum();
+            }
+        });
+    }
+
+    public void updateToCloud(final String objectId, final Map<String, Object> update,
+                              final UpdateCallback callback) {
+        if (!checkDatabase()) {
+            callback.notInit();
+            return;
+        }
+        UserManager.getInstance().checkLogin(new AutoLoginCallback() {
+            @Override
+            public void success(AVObject user) {
+                AVQuery<AVObject> query = new AVQuery<>(tableName);
+                query.getInBackground(objectId, new GetCallback<AVObject>() {
+                    @Override
+                    public void done(AVObject object, AVException e) {
+                        if (e == null) {
+                            if (update != null) {
+                                for (String key : update.keySet()) {
+                                    object.put(key, update.get(key));
+                                }
+                                object.saveInBackground(new SaveCallback() {
+                                    @Override
+                                    public void done(AVException e) {
+                                        if (e == null) {
+                                            callback.success();
+                                        } else {
+                                            callback.syncError(e);
+                                        }
+                                    }
+                                });
+                            }
+                        } else {
+                            callback.syncError(e);
                         }
                     }
                 });
