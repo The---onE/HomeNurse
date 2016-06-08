@@ -1,4 +1,4 @@
-package com.xmx.homenurse.Tools.Data;
+package com.xmx.homenurse.Tools.Data.SQL;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -81,7 +81,27 @@ public abstract class BaseSQLEntityManager<Entity extends ISQLEntity> {
         return database.insert(tableName, null, entity.getContent());
     }
 
-    //更新数据 updateDate(id, "KEY1=Value1", "KEY2=Value2")
+    //删除数据
+    public void deleteById(long id) {
+        if (!checkDatabase()) {
+            return;
+        }
+        database.delete(tableName, "ID = ?", new String[]{String.valueOf(id)});
+
+        version++;
+    }
+
+    //删除数据
+    public void deleteByCloudId(String cloudId) {
+        if (!checkDatabase()) {
+            return;
+        }
+        database.delete(tableName, "CLOUD_ID = ?", new String[]{cloudId});
+
+        version++;
+    }
+
+    //更新数据 updateDateById(id, "KEY1=Value1", "KEY2=Value2")
     public void updateDate(long id, String... strings) {
         if (!checkDatabase()) {
             return;
@@ -98,6 +118,28 @@ public abstract class BaseSQLEntityManager<Entity extends ISQLEntity> {
             content = "";
         }
         String update = "update " + tableName + " " + content + " where ID = " + id;
+        database.execSQL(update);
+
+        version++;
+    }
+
+    //更新数据 updateDateByCloudId(cloudId, "KEY1=Value1", "KEY2=Value2")
+    public void updateDate(String cloudId, String... strings) {
+        if (!checkDatabase()) {
+            return;
+        }
+        String content;
+        if (strings.length > 0) {
+            content = "set ";
+            int i = 0;
+            content += strings[i] + " ";
+            for (i++; i < strings.length; ++i) {
+                content += ", " + strings[i] + " ";
+            }
+        } else {
+            content = "";
+        }
+        String update = "update " + tableName + " " + content + " where CLOUD_ID = '" + cloudId + "'";
         database.execSQL(update);
 
         version++;

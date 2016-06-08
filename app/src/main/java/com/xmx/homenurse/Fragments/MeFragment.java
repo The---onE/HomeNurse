@@ -55,13 +55,18 @@ public class MeFragment extends BaseFragment {
 
     Date birthday;
     String gender;
+    ArrayList<String> genders;
+
+    OptionsPickerView pvOptions;
+    TimePickerView pvTime;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_me, container, false);
+    protected View getContentView(LayoutInflater inflater, ViewGroup container) {
+        return inflater.inflate(R.layout.fragment_me, container, false);
+    }
 
+    @Override
+    protected void initView(View view) {
         nameView = (EditText) view.findViewById(R.id.name);
         genderView = (TextView) view.findViewById(R.id.gender);
         birthdayView = (TextView) view.findViewById(R.id.birthday);
@@ -82,7 +87,24 @@ public class MeFragment extends BaseFragment {
         emailView.setEnabled(false);
         addressView.setEnabled(false);
 
-        final TimePickerView pvTime = new TimePickerView(getContext(), TimePickerView.Type.YEAR_MONTH_DAY);
+        birthdayView.getPaint().setFlags(Paint.UNDERLINE_TEXT_FLAG);
+        genderView.getPaint().setFlags(Paint.UNDERLINE_TEXT_FLAG);
+
+        birthday = new Date(0);
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        Date date = new Date(0);
+        birthdayView.setText(df.format(date));
+
+        gender = getString(R.string.male);
+        genders = new ArrayList<>();
+        genders.add(getString(R.string.male));
+        genders.add(getString(R.string.female));
+        genderView.setText(genders.get(0));
+    }
+
+    @Override
+    protected void setListener(View view) {
+        pvTime = new TimePickerView(getContext(), TimePickerView.Type.YEAR_MONTH_DAY);
         Calendar calendar = Calendar.getInstance();
         pvTime.setRange(calendar.get(Calendar.YEAR) - 50, calendar.get(Calendar.YEAR) + 49);
         pvTime.setTime(new Date());
@@ -103,12 +125,8 @@ public class MeFragment extends BaseFragment {
                 pvTime.show();
             }
         });
-        birthdayView.getPaint().setFlags(Paint.UNDERLINE_TEXT_FLAG);
 
-        final ArrayList<String> genders = new ArrayList<>();
-        genders.add(getString(R.string.male));
-        genders.add(getString(R.string.female));
-        final OptionsPickerView pvOptions = new OptionsPickerView(getContext());
+        pvOptions = new OptionsPickerView(getContext());
         pvOptions.setPicker(genders);
         pvOptions.setCancelable(true);
         pvOptions.setTitle(getString(R.string.gender));
@@ -127,15 +145,42 @@ public class MeFragment extends BaseFragment {
                 pvOptions.show();
             }
         });
-        genderView.getPaint().setFlags(Paint.UNDERLINE_TEXT_FLAG);
 
-        birthday = new Date(0);
-        gender = getString(R.string.male);
-        final DateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-        final Date date = new Date(0);
-        birthdayView.setText(df.format(date));
-        genderView.setText(genders.get(0));
+        edit = (Button) view.findViewById(R.id.btn_edit);
+        edit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!editFlag) {
+                    nameView.setEnabled(true);
+                    genderView.setEnabled(true);
+                    birthdayView.setEnabled(true);
+                    heightView.setEnabled(true);
+                    weightView.setEnabled(true);
+                    idNumberView.setEnabled(true);
+                    phoneView.setEnabled(true);
+                    emailView.setEnabled(true);
+                    addressView.setEnabled(true);
+                    edit.setText(R.string.save);
+                    editFlag = true;
+                } else {
+                    save();
+                }
+            }
+        });
 
+        Button logout = (Button) view.findViewById(R.id.btn_logout);
+        logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                UserManager.getInstance().logout();
+                startActivity(LoginActivity.class);
+                getActivity().finish();
+            }
+        });
+    }
+
+    @Override
+    protected void processLogic(View view, Bundle savedInstanceState) {
         UserManager.getInstance().checkLogin(new AutoLoginCallback() {
             @Override
             public void success(AVObject user) {
@@ -157,6 +202,7 @@ public class MeFragment extends BaseFragment {
                         Date d = new Date(time);
                         pvTime.setTime(d);
                         birthday = d;
+                        DateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
                         birthdayView.setText(df.format(d));
 
                         heightView.setText("" + UserSQLManager.getHeight(c));
@@ -201,40 +247,6 @@ public class MeFragment extends BaseFragment {
                 getActivity().finish();
             }
         });
-
-        edit = (Button) view.findViewById(R.id.btn_edit);
-        edit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (!editFlag) {
-                    nameView.setEnabled(true);
-                    genderView.setEnabled(true);
-                    birthdayView.setEnabled(true);
-                    heightView.setEnabled(true);
-                    weightView.setEnabled(true);
-                    idNumberView.setEnabled(true);
-                    phoneView.setEnabled(true);
-                    emailView.setEnabled(true);
-                    addressView.setEnabled(true);
-                    edit.setText(R.string.save);
-                    editFlag = true;
-                } else {
-                    save();
-                }
-            }
-        });
-
-        Button logout = (Button) view.findViewById(R.id.btn_logout);
-        logout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                UserManager.getInstance().logout();
-                startActivity(LoginActivity.class);
-                getActivity().finish();
-            }
-        });
-
-        return view;
     }
 
     float getEditViewFloat(EditText et) {

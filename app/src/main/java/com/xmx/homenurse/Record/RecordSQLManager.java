@@ -1,7 +1,7 @@
 package com.xmx.homenurse.Record;
 
 import com.xmx.homenurse.Constants;
-import com.xmx.homenurse.Tools.Data.BaseSQLEntityManager;
+import com.xmx.homenurse.Tools.Data.SQL.BaseSQLEntityManager;
 
 import java.util.Date;
 import java.util.List;

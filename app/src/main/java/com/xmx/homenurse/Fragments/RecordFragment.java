@@ -1,7 +1,6 @@
 package com.xmx.homenurse.Fragments;
 
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -66,11 +65,23 @@ public class RecordFragment extends BaseFragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_record, container, false);
+    protected View getContentView(LayoutInflater inflater, ViewGroup container) {
+        return inflater.inflate(R.layout.fragment_record, container, false);
+    }
+
+    @Override
+    protected void initView(View view) {
         picker = (DatePicker) view.findViewById(R.id.date_picker);
 
+        titleView = (TextView) view.findViewById(R.id.tv_title);
+        textView = (TextView) view.findViewById(R.id.tv_text);
+        suggestionView = (TextView) view.findViewById(R.id.tv_suggestion);
+        timeView = (TextView) view.findViewById(R.id.tv_time);
+        card = (CardView) view.findViewById(R.id.record_card);
+    }
+
+    @Override
+    protected void setListener(View view) {
         final Calendar calendar = Calendar.getInstance();
         picker.setDate(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1);
         picker.setMode(DPMode.SINGLE);
@@ -126,17 +137,12 @@ public class RecordFragment extends BaseFragment {
                 startActivity(intent);
             }
         });
+    }
 
-        titleView = (TextView) view.findViewById(R.id.tv_title);
-        textView = (TextView) view.findViewById(R.id.tv_text);
-        suggestionView = (TextView) view.findViewById(R.id.tv_suggestion);
-        timeView = (TextView) view.findViewById(R.id.tv_time);
-        card = (CardView) view.findViewById(R.id.record_card);
-
+    @Override
+    protected void processLogic(View view, Bundle savedInstanceState) {
         updateData();
         refreshCard();
-
-        return view;
     }
 
     void syncFromCloud() {

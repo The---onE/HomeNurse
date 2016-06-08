@@ -1,15 +1,13 @@
-package com.xmx.homenurse.Tools.Data.Cloud;
+package com.xmx.homenurse.Tools.Data.Callback;
 
 import com.avos.avoscloud.AVException;
 
-import java.util.List;
-
 /**
- * Created by The_onE on 2016/5/29.
+ * Created by The_onE on 2016/5/31.
  */
-public abstract class SelectCallback<Entity extends ICloudEntity> {
+public abstract class DelCallback {
 
-    public abstract void success(List<Entity> entities);
+    public abstract void success();
 
     public abstract void notInit();
 

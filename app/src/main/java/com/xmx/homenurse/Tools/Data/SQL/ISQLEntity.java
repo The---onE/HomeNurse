@@ -1,4 +1,4 @@
-package com.xmx.homenurse.Tools.Data;
+package com.xmx.homenurse.Tools.Data.SQL;
 
 import android.content.ContentValues;
 import android.database.Cursor;

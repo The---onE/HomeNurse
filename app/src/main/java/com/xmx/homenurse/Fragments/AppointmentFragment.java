@@ -48,11 +48,17 @@ public class AppointmentFragment extends BaseFragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_appointment, container, false);
+    protected View getContentView(LayoutInflater inflater, ViewGroup container) {
+        return inflater.inflate(R.layout.fragment_appointment, container, false);
+    }
 
+    @Override
+    protected void initView(View view) {
+
+    }
+
+    @Override
+    protected void setListener(View view) {
         TextView add = (TextView) view.findViewById(R.id.tv_add_appointment);
         add.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -64,7 +70,6 @@ public class AppointmentFragment extends BaseFragment {
         ListView appointmentList = (ListView) view.findViewById(R.id.list_appointment);
         adapter = new AppointmentAdapter(getContext());
         appointmentList.setAdapter(adapter);
-
         appointmentList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, final long id) {
@@ -152,8 +157,11 @@ public class AppointmentFragment extends BaseFragment {
                 return false;
             }
         });
+    }
 
-        return view;
+    @Override
+    protected void processLogic(View view, Bundle savedInstanceState) {
+
     }
 
     @Override

@@ -2,9 +2,6 @@ package com.xmx.homenurse.Tools.Data;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-
-import com.xmx.homenurse.User.UserSQLManager;
 
 /**
  * Created by The_onE on 2016/2/21.

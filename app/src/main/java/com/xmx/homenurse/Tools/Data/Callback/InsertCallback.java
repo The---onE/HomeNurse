@@ -1,8 +1,6 @@
-package com.xmx.homenurse.Tools.Data.Cloud;
+package com.xmx.homenurse.Tools.Data.Callback;
 
 import com.avos.avoscloud.AVException;
-
-import java.util.List;
 
 /**
  * Created by The_onE on 2016/5/29.

@@ -1,7 +1,7 @@
 package com.xmx.homenurse.Appointment;
 
 import com.xmx.homenurse.Constants;
-import com.xmx.homenurse.Tools.Data.BaseSQLEntityManager;
+import com.xmx.homenurse.Tools.Data.SQL.BaseSQLEntityManager;
 
 /**
  * Created by The_onE on 2016/3/27.

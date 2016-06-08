@@ -4,7 +4,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 
 import com.xmx.homenurse.Constants;
-import com.xmx.homenurse.Tools.Data.ISQLEntity;
+import com.xmx.homenurse.Tools.Data.SQL.ISQLEntity;
 
 import java.util.Date;
 

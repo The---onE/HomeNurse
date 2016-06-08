@@ -3,7 +3,7 @@ package com.xmx.homenurse.Measure.HeartRate;
 import android.content.ContentValues;
 import android.database.Cursor;
 
-import com.xmx.homenurse.Tools.Data.ISQLEntity;
+import com.xmx.homenurse.Tools.Data.SQL.ISQLEntity;
 
 import java.util.Date;
 

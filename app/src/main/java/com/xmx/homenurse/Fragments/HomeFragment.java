@@ -34,11 +34,17 @@ public class HomeFragment extends BaseFragment {
     long version = 0;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_home, container, false);
+    protected View getContentView(LayoutInflater inflater, ViewGroup container) {
+        return inflater.inflate(R.layout.fragment_home, container, false);
+    }
 
+    @Override
+    protected void initView(View view) {
+
+    }
+
+    @Override
+    protected void setListener(View view) {
         RelativeLayout temperature = (RelativeLayout) view.findViewById(R.id.layout_temperature);
         temperature.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -92,7 +98,10 @@ public class HomeFragment extends BaseFragment {
                 startActivity(intent);
             }
         });
+    }
 
+    @Override
+    protected void processLogic(View view, Bundle savedInstanceState) {
         updateScheduleList();
         Timer timer = new Timer() {
             @Override
@@ -104,8 +113,6 @@ public class HomeFragment extends BaseFragment {
 
         Intent service = new Intent(getContext(), MeasureTimerService.class);
         getContext().startService(service);
-
-        return view;
     }
 
     void updateScheduleList() {
