@@ -1,6 +1,7 @@
 package com.xmx.homenurse.Appointment;
 
 import com.xmx.homenurse.Constants;
+import com.xmx.homenurse.Tools.Data.Sync.BaseSyncEntityManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +30,7 @@ public class AppointmentManager {
     public long updateAppointments() {
         boolean changeFlag = false;
 
-        AppointmentSQLManager sqlManager = AppointmentSQLManager.getInstance();
+        BaseSyncEntityManager.SQLManager sqlManager = AppointmentSyncManager.getInstance().getSQLManager();
         if (sqlManager.getVersion() != sqlVersion) {
             sqlVersion = sqlManager.getVersion();
 

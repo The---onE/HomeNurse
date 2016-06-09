@@ -3,50 +3,27 @@ package com.xmx.homenurse.Appointment;
 import android.content.ContentValues;
 import android.database.Cursor;
 
+import com.avos.avoscloud.AVObject;
 import com.xmx.homenurse.Constants;
+import com.xmx.homenurse.Tools.Data.Cloud.ICloudEntity;
 import com.xmx.homenurse.Tools.Data.SQL.ISQLEntity;
+import com.xmx.homenurse.Tools.Data.Sync.ISyncEntity;
 
 import java.util.Date;
 
 /**
  * Created by The_onE on 2016/3/27.
  */
-public class Appointment implements ISQLEntity {
+public class Appointment implements ISyncEntity {
     public long mId = -1;
     public Date mTime;
     public int mType;
     public String mSymptom;
     public Date mAddTime;
-    public int mStatus;
+    public int mStatus = Constants.STATUS_WAITING;
     public String mCloudId;
 
     public Appointment() {
-    }
-
-    public Appointment(String cloud, Date date, int type, String symptom, Date add) {
-        mCloudId = cloud;
-        mTime = date;
-        mType = type;
-        mSymptom = symptom;
-        mAddTime = add;
-    }
-
-    public Appointment(long id, String cloud, Date date, int type, String symptom, Date add) {
-        mId = id;
-        mCloudId = cloud;
-        mTime = date;
-        mType = type;
-        mSymptom = symptom;
-        mAddTime = add;
-    }
-
-    public Appointment(long id, Date time, int type, String symptom, Date addTime, int status) {
-        mId = id;
-        mTime = time;
-        mType = type;
-        mSymptom = symptom;
-        mAddTime = addTime;
-        mStatus = status;
     }
 
     @Override
@@ -69,14 +46,14 @@ public class Appointment implements ISQLEntity {
         content.put("TIME", mTime.getTime());
         content.put("TYPE", mType);
         content.put("SYMPTOM", mSymptom);
-        content.put("STATUS", Constants.STATUS_WAITING);
+        content.put("STATUS", mStatus);
         content.put("ADD_TIME", mAddTime.getTime());
         content.put("CLOUD_ID", mCloudId);
         return content;
     }
 
     @Override
-    public ISQLEntity convertToEntity(Cursor c) {
+    public Appointment convertToEntity(Cursor c) {
         Appointment appointment = new Appointment();
         appointment.mId = c.getLong(0);
         appointment.mTime = new Date(c.getLong(1));
@@ -85,6 +62,42 @@ public class Appointment implements ISQLEntity {
         appointment.mType = c.getInt(4);
         appointment.mAddTime = new Date(c.getLong(5));
         appointment.mCloudId = c.getString(6);
+        return appointment;
+    }
+
+    @Override
+    public String getCloudId() {
+        return mCloudId;
+    }
+
+    @Override
+    public void setCloudId(String id) {
+        mCloudId = id;
+    }
+
+    @Override
+    public AVObject getContent(String tableName) {
+        AVObject object = new AVObject(tableName);
+        if (mCloudId != null) {
+            object.setObjectId(mCloudId);
+        }
+        object.put("time", mTime);
+        object.put("type", mType);
+        object.put("symptom", mSymptom);
+        object.put("status", mStatus);
+        object.put("addTime", mAddTime);
+        return object;
+    }
+
+    @Override
+    public Appointment convertToEntity(AVObject object) {
+        Appointment appointment = new Appointment();
+        appointment.mCloudId = object.getObjectId();
+        appointment.mTime = object.getDate("time");
+        appointment.mSymptom = object.getString("symptom");
+        appointment.mAddTime = object.getDate("addTime");
+        appointment.mType = object.getInt("type");
+        appointment.mStatus = object.getInt("status");
         return appointment;
     }
 }

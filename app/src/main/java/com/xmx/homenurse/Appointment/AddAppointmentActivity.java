@@ -18,6 +18,7 @@ import com.bigkoo.pickerview.TimePickerView;
 import com.xmx.homenurse.Tools.ActivityBase.BaseTempActivity;
 import com.xmx.homenurse.Constants;
 import com.xmx.homenurse.R;
+import com.xmx.homenurse.Tools.Data.Callback.InsertCallback;
 import com.xmx.homenurse.User.Callback.AutoLoginCallback;
 import com.xmx.homenurse.User.UserManager;
 
@@ -167,60 +168,50 @@ public class AddAppointmentActivity extends BaseTempActivity {
                     showToast(R.string.appointment_error);
                     return;
                 }
-                pushToCloud(appointmentTime, appointmentType, symptom, now);
-            }
-        });
-    }
+                Appointment appointment = new Appointment();
+                appointment.mTime = appointmentTime;
+                appointment.mType = appointmentType;
+                appointment.mSymptom = symptom;
+                appointment.mAddTime = now;
+                appointment.mStatus = Constants.STATUS_WAITING;
 
-    private void pushToCloud(final Date date, final int type, final String symptom, final Date add) {
-        final AVObject post = new AVObject("Appointment");
-        post.put("time", date.getTime());
-        post.put("type", type);
-        post.put("symptom", symptom);
-        post.put("status", Constants.STATUS_WAITING);
-        post.put("addTime", add.getTime());
-
-        UserManager.getInstance().checkLogin(new AutoLoginCallback() {
-            @Override
-            public void success(AVObject user) {
-                post.put("patient", user);
-                post.put("patientName", user.getString("nickname"));
-                post.saveInBackground(new SaveCallback() {
+                AppointmentSyncManager.getInstance().insertData(appointment, new InsertCallback() {
                     @Override
-                    public void done(AVException e) {
-                        if (e == null) {
-                            Appointment appointment = new Appointment(post.getObjectId(),
-                                    appointmentTime, appointmentType, symptom, add);
+                    public void success(String objectId) {
+                        showToast(R.string.add_success);
+                        finish();
+                    }
 
-                            AppointmentSQLManager.getInstance()
-                                    .insertData(appointment);
-                            showToast(R.string.add_success);
-                            finish();
-                        } else {
-                            e.printStackTrace();
-                        }
+                    @Override
+                    public void notInit() {
+                        showToast(R.string.failure);
+                    }
+
+                    @Override
+                    public void syncError(AVException e) {
+                        showToast(R.string.sync_failure);
+                    }
+
+                    @Override
+                    public void notLoggedIn() {
+                        showToast(R.string.not_loggedin);
+                    }
+
+                    @Override
+                    public void errorNetwork() {
+                        showToast(R.string.network_error);
+                    }
+
+                    @Override
+                    public void errorUsername() {
+                        showToast(R.string.not_loggedin);
+                    }
+
+                    @Override
+                    public void errorChecksum() {
+                        showToast(R.string.not_loggedin);
                     }
                 });
-            }
-
-            @Override
-            public void notLoggedIn() {
-                showToast(R.string.not_loggedin);
-            }
-
-            @Override
-            public void errorNetwork() {
-                showToast(R.string.network_error);
-            }
-
-            @Override
-            public void errorUsername() {
-                showToast(R.string.not_loggedin);
-            }
-
-            @Override
-            public void errorChecksum() {
-                showToast(R.string.not_loggedin);
             }
         });
     }

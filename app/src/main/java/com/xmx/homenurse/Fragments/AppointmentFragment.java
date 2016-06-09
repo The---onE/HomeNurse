@@ -13,24 +13,17 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.avos.avoscloud.AVException;
-import com.avos.avoscloud.AVObject;
-import com.avos.avoscloud.AVQuery;
-import com.avos.avoscloud.FindCallback;
-import com.avos.avoscloud.GetCallback;
-import com.avos.avoscloud.SaveCallback;
 import com.xmx.homenurse.Appointment.AddAppointmentActivity;
 import com.xmx.homenurse.Appointment.Appointment;
+import com.xmx.homenurse.Appointment.AppointmentSyncManager;
 import com.xmx.homenurse.Tools.BaseFragment;
 import com.xmx.homenurse.Constants;
 import com.xmx.homenurse.Appointment.AppointmentManager;
-import com.xmx.homenurse.Appointment.AppointmentSQLManager;
 import com.xmx.homenurse.R;
 import com.xmx.homenurse.Appointment.AppointmentAdapter;
-import com.xmx.homenurse.Tools.Callback;
-import com.xmx.homenurse.User.Callback.AutoLoginCallback;
-import com.xmx.homenurse.User.UserManager;
+import com.xmx.homenurse.Tools.Data.Callback.SelectCallback;
+import com.xmx.homenurse.Tools.Data.Callback.UpdateCallback;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -44,7 +37,53 @@ public class AppointmentFragment extends BaseFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        syncFromCloud();
+        //AppointmentSyncManager.getInstance().getSQLManager().clearDatabase();
+        AppointmentSyncManager.getInstance().syncFromCloud(null, new SelectCallback<Appointment>() {
+            @Override
+            public void success(List<Appointment> appointments) {
+                for (Appointment appointment : appointments) {
+                    int status = AppointmentSyncManager.getInstance().getSQLManager()
+                            .selectByCloudId(appointment.mCloudId).mStatus;
+                    if (status != appointment.mStatus) {
+                        AppointmentSyncManager.getInstance().getSQLManager()
+                                .updateDate(appointment.mCloudId,
+                                "STATUS = " + appointment.mStatus);
+                    }
+                }
+                showToast(R.string.sync_success);
+                updateAppointmentList();
+            }
+
+            @Override
+            public void notInit() {
+                showToast(R.string.failure);
+            }
+
+            @Override
+            public void syncError(AVException e) {
+                showToast(R.string.sync_failure);
+            }
+
+            @Override
+            public void notLoggedIn() {
+                showToast(R.string.not_loggedin);
+            }
+
+            @Override
+            public void errorNetwork() {
+                showToast(R.string.network_error);
+            }
+
+            @Override
+            public void errorUsername() {
+                showToast(R.string.username_error);
+            }
+
+            @Override
+            public void errorChecksum() {
+                showToast(R.string.not_loggedin);
+            }
+        });
     }
 
     @Override
@@ -73,7 +112,7 @@ public class AppointmentFragment extends BaseFragment {
         appointmentList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, final long id) {
-                Appointment appointment = (Appointment) adapter.getItem(i);
+                final Appointment appointment = (Appointment) adapter.getItem(i);
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                 switch (appointment.mStatus) {
                     case Constants.STATUS_WAITING:
@@ -82,20 +121,44 @@ public class AppointmentFragment extends BaseFragment {
                         builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                Appointment c = AppointmentSQLManager.getInstance().selectById(id);
-                                if (c != null) {
-                                    syncToCloud(c.mCloudId,
-                                            Constants.STATUS_CANCELED,
-                                            new Callback() {
-                                                @Override
-                                                public void func() {
-                                                    AppointmentSQLManager.getInstance()
-                                                            .cancelAppointment(id);
-                                                    showToast(R.string.sync_success);
-                                                    updateAppointmentList();
-                                                }
-                                            });
-                                }
+                                AppointmentSyncManager.getInstance()
+                                        .cancelAppointment(appointment.mCloudId, new UpdateCallback() {
+                                            @Override
+                                            public void success() {
+                                                showToast(R.string.sync_success);
+                                                updateAppointmentList();
+                                            }
+
+                                            @Override
+                                            public void notInit() {
+                                                showToast(R.string.failure);
+                                            }
+
+                                            @Override
+                                            public void syncError(AVException e) {
+                                                showToast(R.string.sync_failure);
+                                            }
+
+                                            @Override
+                                            public void notLoggedIn() {
+                                                showToast(R.string.not_loggedin);
+                                            }
+
+                                            @Override
+                                            public void errorNetwork() {
+                                                showToast(R.string.network_error);
+                                            }
+
+                                            @Override
+                                            public void errorUsername() {
+                                                showToast(R.string.username_error);
+                                            }
+
+                                            @Override
+                                            public void errorChecksum() {
+                                                showToast(R.string.not_loggedin);
+                                            }
+                                        });
                             }
                         });
                         builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -112,37 +175,87 @@ public class AppointmentFragment extends BaseFragment {
                         builder.setNegativeButton("删除", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                Appointment c = AppointmentSQLManager.getInstance().selectById(id);
-                                if (c != null) {
-                                    syncToCloud(c.mCloudId,
-                                            Constants.STATUS_DELETED,
-                                            new Callback() {
-                                                @Override
-                                                public void func() {
-                                                    AppointmentSQLManager.getInstance()
-                                                            .deleteAppointment(id);
-                                                    updateAppointmentList();
-                                                }
-                                            });
-                                }
+                                AppointmentSyncManager.getInstance()
+                                        .deleteAppointment(appointment.mCloudId, new UpdateCallback() {
+                                            @Override
+                                            public void success() {
+                                                showToast(R.string.sync_success);
+                                                updateAppointmentList();
+                                            }
+
+                                            @Override
+                                            public void notInit() {
+                                                showToast(R.string.failure);
+                                            }
+
+                                            @Override
+                                            public void syncError(AVException e) {
+                                                showToast(R.string.sync_failure);
+                                            }
+
+                                            @Override
+                                            public void notLoggedIn() {
+                                                showToast(R.string.not_loggedin);
+                                            }
+
+                                            @Override
+                                            public void errorNetwork() {
+                                                showToast(R.string.network_error);
+                                            }
+
+                                            @Override
+                                            public void errorUsername() {
+                                                showToast(R.string.username_error);
+                                            }
+
+                                            @Override
+                                            public void errorChecksum() {
+                                                showToast(R.string.not_loggedin);
+                                            }
+                                        });
                             }
                         });
                         builder.setPositiveButton("恢复", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                Appointment c = AppointmentSQLManager.getInstance().selectById(id);
-                                if (c != null) {
-                                    syncToCloud(c.mCloudId,
-                                            Constants.STATUS_WAITING,
-                                            new Callback() {
-                                                @Override
-                                                public void func() {
-                                                    AppointmentSQLManager.getInstance()
-                                                            .resumeAppointment(id);
-                                                    updateAppointmentList();
-                                                }
-                                            });
-                                }
+                                AppointmentSyncManager.getInstance()
+                                        .resumeAppointment(appointment.mCloudId, new UpdateCallback() {
+                                            @Override
+                                            public void success() {
+                                                showToast(R.string.sync_success);
+                                                updateAppointmentList();
+                                            }
+
+                                            @Override
+                                            public void notInit() {
+                                                showToast(R.string.failure);
+                                            }
+
+                                            @Override
+                                            public void syncError(AVException e) {
+                                                showToast(R.string.sync_failure);
+                                            }
+
+                                            @Override
+                                            public void notLoggedIn() {
+                                                showToast(R.string.not_loggedin);
+                                            }
+
+                                            @Override
+                                            public void errorNetwork() {
+                                                showToast(R.string.network_error);
+                                            }
+
+                                            @Override
+                                            public void errorUsername() {
+                                                showToast(R.string.username_error);
+                                            }
+
+                                            @Override
+                                            public void errorChecksum() {
+                                                showToast(R.string.not_loggedin);
+                                            }
+                                        });
                             }
                         });
                         builder.setNeutralButton("取消", new DialogInterface.OnClickListener() {
@@ -178,7 +291,7 @@ public class AppointmentFragment extends BaseFragment {
         }
     }
 
-    void syncFromCloud() {
+    /*void syncFromCloud() {
         UserManager.getInstance().checkLogin(new AutoLoginCallback() {
             @Override
             public void success(AVObject user) {
@@ -234,56 +347,7 @@ public class AppointmentFragment extends BaseFragment {
                 showToast(R.string.not_loggedin);
             }
         });
-    }
+    }*/
 
-    void syncToCloud(final String id, final int status, final Callback callback) {
-        UserManager.getInstance().checkLogin(new AutoLoginCallback() {
-            @Override
-            public void success(AVObject user) {
-                AVQuery<AVObject> query = new AVQuery<>("Appointment");
-                query.getInBackground(id, new GetCallback<AVObject>() {
-                    public void done(AVObject post, AVException e) {
-                        if (e == null) {
-                            post.put("status", status);
-                            post.saveInBackground(new SaveCallback() {
-                                @Override
-                                public void done(AVException e) {
-                                    if (e == null) {
-                                        callback.func();
-                                        showToast(R.string.sync_success);
-                                    } else {
-                                        showToast(R.string.sync_failure);
-                                        e.printStackTrace();
-                                    }
-                                }
-                            });
-                        } else {
-                            showToast(R.string.sync_failure);
-                            e.printStackTrace();
-                        }
-                    }
-                });
-            }
 
-            @Override
-            public void notLoggedIn() {
-                showToast(R.string.not_loggedin);
-            }
-
-            @Override
-            public void errorNetwork() {
-                showToast(R.string.network_error);
-            }
-
-            @Override
-            public void errorUsername() {
-                showToast(R.string.not_loggedin);
-            }
-
-            @Override
-            public void errorChecksum() {
-                showToast(R.string.not_loggedin);
-            }
-        });
-    }
 }
