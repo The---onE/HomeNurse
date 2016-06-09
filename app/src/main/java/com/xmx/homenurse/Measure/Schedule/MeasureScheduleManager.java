@@ -1,7 +1,5 @@
 package com.xmx.homenurse.Measure.Schedule;
 
-import android.database.Cursor;
-
 import com.xmx.homenurse.Constants;
 
 import java.util.ArrayList;
@@ -35,40 +33,13 @@ public class MeasureScheduleManager {
         if (sqlManager.getVersion() != sqlVersion) {
             sqlVersion = sqlManager.getVersion();
 
-            Cursor c = sqlManager.selectFutureSchedule();
-            measureSchedules.clear();
-            if (c.moveToFirst()) {
-                do {
-                    long id = MeasureScheduleSQLManager.getId(c);
-                    String title = MeasureScheduleSQLManager.getTitle(c);
-                    String text = MeasureScheduleSQLManager.getText(c);
-
-                    boolean remindFlag = false;
-                    boolean dailyFlag = false;
-
-                    int repeat = MeasureScheduleSQLManager.getRepeat(c);
-                    if (repeat > 0) {
-                        remindFlag = true;
-                    }
-
-                    int type = MeasureScheduleSQLManager.getType(c);
-                    if (type == Constants.DAILY_TYPE) {
-                        dailyFlag = true;
-                    }
-                    long time = MeasureScheduleSQLManager.getActualTime(c);
-
-                    int period = MeasureScheduleSQLManager.getPeriod(c);
-
-                    MeasureSchedule p = new MeasureSchedule(id, title, text,  time, remindFlag, dailyFlag, period);
-                    measureSchedules.add(p);
-                } while (c.moveToNext());
-            }
+            measureSchedules = sqlManager.selectFutureSchedule();
             changeFlag = true;
         }
 
         long now = System.currentTimeMillis();
         for (MeasureSchedule p : measureSchedules) {
-            long pt = p.getTime();
+            long pt = p.mTime;
             long delta = pt - now;
             long newBefore = 0;
             String newBeforeString = "";
@@ -92,8 +63,8 @@ public class MeasureScheduleManager {
 
             if (p.checkBefore(newBefore)) {
                 changeFlag = true;
-                p.setBefore(newBefore);
-                p.setBeforeString(newBeforeString);
+                p.mBefore = newBefore;
+                p.mBeforeString = newBeforeString;
             }
         }
 

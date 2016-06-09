@@ -42,7 +42,7 @@ public class MeasureScheduleCardAdapter extends BaseAdapter {
 
     @Override
     public long getItemId(int position) {
-        return MeasureScheduleManager.getInstance().getMeasureSchedules().get(position).getId();
+        return MeasureScheduleManager.getInstance().getMeasureSchedules().get(position).mId;
     }
 
     static class ViewHolder {
@@ -75,23 +75,23 @@ public class MeasureScheduleCardAdapter extends BaseAdapter {
         List<MeasureSchedule> plans = MeasureScheduleManager.getInstance().getMeasureSchedules();
         if (position < plans.size()) {
             MeasureSchedule plan = plans.get(position);
-            holder.title.setText(plan.getTitle());
+            holder.title.setText(plan.mTitle);
             holder.time.setText(plan.getTimeString());
-            holder.text.setText(plan.getText());
+            holder.text.setText(plan.mText);
 
-            if (plan.isRemindFlag()) {
+            if (plan.mRemindFlag) {
                 holder.remind.setVisibility(View.VISIBLE);
             } else {
                 holder.remind.setVisibility(View.GONE);
             }
 
-            if (plan.isDailyFlag()) {
+            if (plan.mDailyFlag) {
                 holder.daily.setVisibility(View.VISIBLE);
             } else {
                 holder.daily.setVisibility(View.GONE);
             }
 
-            int period = plan.getPeriod();
+            int period = plan.mPeriod;
             if (period <= 0) {
                 holder.period.setVisibility(View.GONE);
             } else {

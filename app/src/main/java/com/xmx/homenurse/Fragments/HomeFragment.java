@@ -94,7 +94,7 @@ public class HomeFragment extends BaseFragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getContext(), MeasureScheduleDetailActivity.class);
                 MeasureSchedule measureSchedule = (MeasureSchedule) adapter.getItem(position);
-                intent.putExtra("id", measureSchedule.getId());
+                intent.putExtra("id", measureSchedule.mId);
                 startActivity(intent);
             }
         });

@@ -1,6 +1,5 @@
 package com.xmx.homenurse.Fragments;
 
-import android.database.Cursor;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -20,6 +19,7 @@ import com.bigkoo.pickerview.OptionsPickerView;
 import com.bigkoo.pickerview.TimePickerView;
 import com.xmx.homenurse.Tools.BaseFragment;
 import com.xmx.homenurse.User.Callback.AutoLoginCallback;
+import com.xmx.homenurse.User.User;
 import com.xmx.homenurse.User.UserManager;
 import com.xmx.homenurse.User.UserSQLManager;
 import com.xmx.homenurse.R;
@@ -185,36 +185,34 @@ public class MeFragment extends BaseFragment {
             @Override
             public void success(AVObject user) {
                 long id = UserManager.getId(user);
-                if (id > 0) {
-                    Cursor c = UserSQLManager.getInstance().getUserById(id);
-                    if (c.moveToFirst()) {
-                        nameView.setText(UserSQLManager.getName(c));
-                        genderView.setText(UserSQLManager.getGender(c));
-                        for (int i = 0; i < genders.size(); ++i) {
-                            String s = genders.get(i);
-                            if (s.equals(UserSQLManager.getGender(c))) {
-                                pvOptions.setSelectOptions(i);
-                                break;
-                            }
+                User u = UserSQLManager.getInstance().selectById(id);
+                if (u != null) {
+                    nameView.setText(u.mName);
+                    genderView.setText(u.mGender);
+                    for (int i = 0; i < genders.size(); ++i) {
+                        String s = genders.get(i);
+                        if (s.equals(u.mGender)) {
+                            pvOptions.setSelectOptions(i);
+                            break;
                         }
-
-                        long time = UserSQLManager.getBirthday(c);
-                        Date d = new Date(time);
-                        pvTime.setTime(d);
-                        birthday = d;
-                        DateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-                        birthdayView.setText(df.format(d));
-
-                        heightView.setText("" + UserSQLManager.getHeight(c));
-                        weightView.setText("" + UserSQLManager.getWeight(c));
-                        idNumberView.setText(UserSQLManager.getIdNumber(c));
-                        phoneView.setText(UserSQLManager.getPhont(c));
-                        emailView.setText(UserSQLManager.getEmail(c));
-                        addressView.setText(UserSQLManager.getAddress(c));
-                    } else {
-                        UserSQLManager.getInstance().insertUser(id, "", genders.get(0),
-                                new Date(0), 0, 0, "", "", "", "");
                     }
+
+                    Date d = u.mBirthday;
+                    pvTime.setTime(d);
+                    birthday = d;
+                    DateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                    birthdayView.setText(df.format(d));
+
+                    heightView.setText("" + u.mHeight);
+                    weightView.setText("" + u.mWeight);
+                    idNumberView.setText(u.mIdNumber);
+                    phoneView.setText(u.mPhone);
+                    emailView.setText(u.mEmail);
+                    addressView.setText(u.mAddress);
+                } else {
+                    u = new User(id, "", genders.get(0),
+                            new Date(0), 0, 0, "", "", "", "");
+                    UserSQLManager.getInstance().insertData(u);
                 }
             }
 
@@ -249,7 +247,7 @@ public class MeFragment extends BaseFragment {
         });
     }
 
-    float getEditViewFloat(EditText et) {
+    double getEditViewDouble(EditText et) {
         if (!et.getText().toString().equals("")) {
             return Float.parseFloat(et.getText().toString());
         } else {
@@ -263,16 +261,18 @@ public class MeFragment extends BaseFragment {
             public void success(AVObject user) {
                 String name = "'" + nameView.getText().toString() + "'";
                 String gen = "'" + gender + "'";
-                float height = getEditViewFloat(heightView);
-                float weight = getEditViewFloat(weightView);
+                double height = getEditViewDouble(heightView);
+                double weight = getEditViewDouble(weightView);
 
                 String idN = idNumberView.getText().toString();
-                String regex = "(^\\d{15}$)|(^\\d{17}([0-9]|X)$)";
-                Pattern pattern = Pattern.compile(regex);
-                Matcher matcher = pattern.matcher(idN);
-                if (!matcher.find()) {
-                    showToast(R.string.error_id);
-                    return;
+                if (!idN.equals("")) {
+                    String regex = "(^\\d{15}$)|(^\\d{17}([0-9]|X)$)";
+                    Pattern pattern = Pattern.compile(regex);
+                    Matcher matcher = pattern.matcher(idN);
+                    if (!matcher.find()) {
+                        showToast(R.string.error_id);
+                        return;
+                    }
                 }
                 String idNumber = "'" + idN + "'";
                 String phone = "'" + phoneView.getText().toString() + "'";
@@ -284,8 +284,9 @@ public class MeFragment extends BaseFragment {
                     UserSQLManager.getInstance().updateUser(id, name, gen, birthday, height,
                             weight, idNumber, phone, email, address);
                 } else {
-                    UserSQLManager.getInstance().insertUser(id, name, gen, birthday,
+                    User u = new User(id, name, gen, birthday,
                             height, weight, idNumber, phone, email, address);
+                    UserSQLManager.getInstance().insertData(u);
                 }
                 syncToCloud(name, gen, birthday, height, weight, idNumber, phone, email, address);
                 showToast(R.string.save_success);
@@ -336,7 +337,7 @@ public class MeFragment extends BaseFragment {
     }
 
     public void syncToCloud(final String name, final String gender, final Date birthday,
-                            final float height, final float weight,
+                            final double height, final double weight,
                             final String idNumber, final String phone, final String email,
                             final String address) {
         UserManager.getInstance().checkLogin(new AutoLoginCallback() {

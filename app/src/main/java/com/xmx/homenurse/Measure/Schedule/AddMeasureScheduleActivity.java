@@ -123,7 +123,8 @@ public class AddMeasureScheduleActivity extends BaseTempActivity {
     }
 
     void insertPlan(String title, String text, Date date, int type, int repeat, int period) {
-        long id = MeasureScheduleSQLManager.getInstance().insertSchedule(title, text, date, type, repeat, period);
+        MeasureSchedule entity = new MeasureSchedule(title, text, date, type, repeat, period);
+        long id = MeasureScheduleSQLManager.getInstance().insertData(entity);
         if (id >= 0) {
             showToast("添加成功");
             finish();

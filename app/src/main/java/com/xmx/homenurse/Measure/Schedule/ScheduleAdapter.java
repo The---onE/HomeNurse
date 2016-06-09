@@ -76,26 +76,26 @@ public class ScheduleAdapter extends BaseAdapter {
         List<MeasureSchedule> measureSchedule = MeasureScheduleManager.getInstance().getMeasureSchedules();
         if (position < measureSchedule.size()) {
             MeasureSchedule plan = measureSchedule.get(position);
-            holder.title.setText(plan.getTitle());
+            holder.title.setText(plan.mTitle);
             holder.title.setTextColor(Color.BLACK);
 
             holder.time.setText(plan.getTimeString());
 
-            holder.before.setText(plan.getBeforeString());
+            holder.before.setText(plan.mBeforeString);
 
-            if (plan.isRemindFlag()) {
+            if (plan.mRemindFlag) {
                 holder.remind.setVisibility(View.VISIBLE);
             } else {
                 holder.remind.setVisibility(View.GONE);
             }
 
-            if (plan.isDailyFlag()) {
+            if (plan.mDailyFlag) {
                 holder.daily.setVisibility(View.VISIBLE);
             } else {
                 holder.daily.setVisibility(View.GONE);
             }
 
-            int period = plan.getPeriod();
+            int period = plan.mPeriod;
             if (period <= 0) {
                 holder.period.setVisibility(View.GONE);
             } else {

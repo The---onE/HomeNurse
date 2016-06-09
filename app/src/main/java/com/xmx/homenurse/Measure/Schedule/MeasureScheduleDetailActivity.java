@@ -111,7 +111,7 @@ public class MeasureScheduleDetailActivity extends BaseTempActivity
             @Override
             public int onMenuItemClick(View v, int itemPosition, int buttonPosition, int direction) {
                 MeasureSchedule plan = (MeasureSchedule) adapter.getItem(itemPosition);
-                long id = plan.getId();
+                long id = plan.mId;
                 switch (direction) {
                     case MenuItem.DIRECTION_LEFT:
                         return Menu.ITEM_SCROLL_BACK;

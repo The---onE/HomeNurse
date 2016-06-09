@@ -6,7 +6,6 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.widget.Toast;
@@ -46,15 +45,15 @@ public class MeasureTimerService extends Service {
     }
 
     boolean getLatestPlan() {
-        Cursor c = MeasureScheduleSQLManager.getInstance().getLatestSchedule();
+        MeasureSchedule entity = MeasureScheduleSQLManager.getInstance().getLatestSchedule();
 
-        if (c.moveToFirst()) {
-            latestId = MeasureScheduleSQLManager.getId(c);
-            latestTime = MeasureScheduleSQLManager.getActualTime(c);
-            latestTitle = MeasureScheduleSQLManager.getTitle(c);
-            latestPlanTime = MeasureScheduleSQLManager.getPlanTime(c);
-            latestRepeat = MeasureScheduleSQLManager.getRepeat(c);
-            latestPeriod = MeasureScheduleSQLManager.getPeriod(c);
+        if (entity != null) {
+            latestId = entity.mId;
+            latestTime = entity.mTime;
+            latestTitle = entity.mTitle;
+            latestPlanTime = entity.mPlanTime;
+            latestRepeat = entity.mRepeat;
+            latestPeriod = entity.mPeriod;
 
             latestFlag = true;
         } else {
