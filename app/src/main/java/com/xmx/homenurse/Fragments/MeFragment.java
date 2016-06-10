@@ -361,7 +361,7 @@ public class MeFragment extends BaseFragment {
                                     weight, idNumber, phone, email, address, new UpdateCallback() {
                                         @Override
                                         public void success() {
-
+                                            showToast(R.string.save_success);
                                         }
 
                                         @Override
@@ -400,7 +400,7 @@ public class MeFragment extends BaseFragment {
                             UserSyncManager.getInstance().insertData(u, new InsertCallback() {
                                 @Override
                                 public void success(String objectId) {
-
+                                    showToast(R.string.save_success);
                                 }
 
                                 @Override
@@ -467,7 +467,6 @@ public class MeFragment extends BaseFragment {
                     }
                 });
 
-                showToast(R.string.save_success);
                 nameView.setEnabled(false);
                 genderView.setEnabled(false);
                 birthdayView.setEnabled(false);

@@ -20,6 +20,7 @@ import com.xmx.homenurse.Constants;
 import com.xmx.homenurse.R;
 import com.xmx.homenurse.Tools.Data.Callback.InsertCallback;
 import com.xmx.homenurse.User.Callback.AutoLoginCallback;
+import com.xmx.homenurse.User.LoginActivity;
 import com.xmx.homenurse.User.UserManager;
 
 import java.text.DateFormat;
@@ -168,28 +169,56 @@ public class AddAppointmentActivity extends BaseTempActivity {
                     showToast(R.string.appointment_error);
                     return;
                 }
-                Appointment appointment = new Appointment();
+
+                final Appointment appointment = new Appointment();
                 appointment.mTime = appointmentTime;
                 appointment.mType = appointmentType;
                 appointment.mSymptom = symptom;
                 appointment.mAddTime = now;
                 appointment.mStatus = Constants.STATUS_WAITING;
 
-                AppointmentSyncManager.getInstance().insertData(appointment, new InsertCallback() {
+                UserManager.getInstance().checkLogin(new AutoLoginCallback() {
                     @Override
-                    public void success(String objectId) {
-                        showToast(R.string.add_success);
-                        finish();
-                    }
+                    public void success(AVObject user) {
+                        appointment.mPatientName = user.getString("nickname");
 
-                    @Override
-                    public void notInit() {
-                        showToast(R.string.failure);
-                    }
+                        AppointmentSyncManager.getInstance().insertData(appointment, new InsertCallback() {
+                            @Override
+                            public void success(String objectId) {
+                                showToast(R.string.add_success);
+                                finish();
+                            }
 
-                    @Override
-                    public void syncError(AVException e) {
-                        showToast(R.string.sync_failure);
+                            @Override
+                            public void notInit() {
+                                showToast(R.string.failure);
+                            }
+
+                            @Override
+                            public void syncError(AVException e) {
+                                showToast(R.string.sync_failure);
+                            }
+
+                            @Override
+                            public void notLoggedIn() {
+                                showToast(R.string.not_loggedin);
+                            }
+
+                            @Override
+                            public void errorNetwork() {
+                                showToast(R.string.network_error);
+                            }
+
+                            @Override
+                            public void errorUsername() {
+                                showToast(R.string.not_loggedin);
+                            }
+
+                            @Override
+                            public void errorChecksum() {
+                                showToast(R.string.not_loggedin);
+                            }
+                        });
                     }
 
                     @Override

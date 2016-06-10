@@ -21,6 +21,7 @@ public class Appointment implements ISyncEntity {
     public String mSymptom;
     public Date mAddTime;
     public int mStatus = Constants.STATUS_WAITING;
+    public String mPatientName;
     public String mCloudId;
 
     public Appointment() {
@@ -86,6 +87,7 @@ public class Appointment implements ISyncEntity {
         object.put("symptom", mSymptom);
         object.put("status", mStatus);
         object.put("addTime", mAddTime);
+        object.put("patientName", mPatientName);
         return object;
     }
 
