@@ -1,7 +1,7 @@
 package com.xmx.homenurse.Record;
 
 import com.xmx.homenurse.Constants;
-import com.xmx.homenurse.Tools.Data.SQL.BaseSQLEntityManager;
+import com.xmx.homenurse.Tools.Data.Sync.BaseSyncEntityManager;
 
 import java.util.Date;
 import java.util.List;
@@ -9,20 +9,20 @@ import java.util.List;
 /**
  * Created by The_onE on 2015/10/23.
  */
-public class RecordSQLManager extends BaseSQLEntityManager<Record> {
-    private static RecordSQLManager instance;
+public class RecordSyncManager extends BaseSyncEntityManager<Record> {
+    private static RecordSyncManager instance;
 
-    public synchronized static RecordSQLManager getInstance() {
+    public synchronized static RecordSyncManager getInstance() {
         if (null == instance) {
-            instance = new RecordSQLManager();
+            instance = new RecordSyncManager();
         }
         return instance;
     }
 
-    private RecordSQLManager() {
-        tableName = "RECORD";
-        entityTemplate = new Record();
-        openDatabase();
+    private RecordSyncManager() {
+        setTableName("Prescription");
+        setEntityTemplate(new Record());
+        setUserField("patient");
     }
 
     public List<Record> selectByDay(int year, int month, int day) {
@@ -33,7 +33,7 @@ public class RecordSQLManager extends BaseSQLEntityManager<Record> {
         day1.setYear(year - 1900);
         day1.setMonth(month - 1);
         day1.setDate(day);
-        return selectAmount("TIME", "" + day1.getTime(),
+        return getSQLManager().selectAmount("TIME", "" + day1.getTime(),
                 "" + (day1.getTime() + Constants.DAY_TIME));
     }
 }

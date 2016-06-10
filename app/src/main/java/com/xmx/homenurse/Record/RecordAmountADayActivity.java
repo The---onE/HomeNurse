@@ -20,7 +20,7 @@ public class RecordAmountADayActivity extends BaseTempActivity {
         int day = getIntent().getIntExtra("day", 0);
         recordList = getViewById(R.id.record_list);
 
-        List<Record> records = RecordSQLManager.getInstance().selectByDay(year, month, day);
+        List<Record> records = RecordSyncManager.getInstance().selectByDay(year, month, day);
         RecordAdapter adapter = new RecordAdapter(this, records);
         recordList.setAdapter(adapter);
     }

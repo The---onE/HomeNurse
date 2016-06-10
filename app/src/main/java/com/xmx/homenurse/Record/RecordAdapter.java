@@ -74,7 +74,7 @@ public class RecordAdapter extends BaseAdapter {
             String title = record.mTitle;
             String text = record.mText;
             String suggestion = record.mSuggestion;
-            Date time = new Date(record.mTime);
+            Date time = record.mTime;
             DateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
             holder.title.setText(title);

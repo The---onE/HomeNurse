@@ -20,9 +20,9 @@ import com.avos.avoscloud.AVQuery;
 import com.avos.avoscloud.FindCallback;
 import com.xmx.homenurse.Record.Record;
 import com.xmx.homenurse.Record.RecordAmountADayActivity;
+import com.xmx.homenurse.Record.RecordSyncManager;
 import com.xmx.homenurse.Tools.BaseFragment;
 import com.xmx.homenurse.Constants;
-import com.xmx.homenurse.Record.RecordSQLManager;
 import com.xmx.homenurse.Record.Datepicker.DateManager;
 import com.xmx.homenurse.Record.Datepicker.bizs.calendars.DPCManager;
 import com.xmx.homenurse.Record.Datepicker.bizs.decors.DPDecor;
@@ -30,6 +30,7 @@ import com.xmx.homenurse.Record.Datepicker.cons.DPMode;
 import com.xmx.homenurse.Record.Datepicker.views.DatePicker;
 import com.xmx.homenurse.R;
 import com.xmx.homenurse.Record.AddRecordActivity;
+import com.xmx.homenurse.Tools.Data.Callback.SelectCallback;
 import com.xmx.homenurse.User.Callback.AutoLoginCallback;
 import com.xmx.homenurse.User.UserManager;
 
@@ -61,7 +62,43 @@ public class RecordFragment extends BaseFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        syncFromCloud();
+        RecordSyncManager.getInstance().syncFromCloud(null, new SelectCallback<Record>() {
+            @Override
+            public void success(List<Record> records) {
+                showToast(R.string.sync_success);
+                updateData();
+            }
+
+            @Override
+            public void notInit() {
+                showToast(R.string.failure);
+            }
+
+            @Override
+            public void syncError(AVException e) {
+                showToast(R.string.sync_failure);
+            }
+
+            @Override
+            public void notLoggedIn() {
+                showToast(R.string.not_loggedin);
+            }
+
+            @Override
+            public void errorNetwork() {
+                showToast(R.string.network_error);
+            }
+
+            @Override
+            public void errorUsername() {
+                showToast(R.string.username_error);
+            }
+
+            @Override
+            public void errorChecksum() {
+                showToast(R.string.not_loggedin);
+            }
+        });
     }
 
     @Override
@@ -145,72 +182,15 @@ public class RecordFragment extends BaseFragment {
         refreshCard();
     }
 
-    void syncFromCloud() {
-        UserManager.getInstance().checkLogin(new AutoLoginCallback() {
-            @Override
-            public void success(AVObject user) {
-                AVQuery<AVObject> query = new AVQuery<>("Prescription");
-                query.whereEqualTo("patient", user.getObjectId());
-                //query.whereEqualTo("status", Constants.STATUS_WAITING);
-                query.findInBackground(new FindCallback<AVObject>() {
-                    public void done(List<AVObject> avObjects, AVException e) {
-                        if (e == null) {
-                            for (AVObject object : avObjects) {
-                                int id = Math.abs(object.getObjectId().hashCode());
-                                Record c = RecordSQLManager.getInstance().selectById(id);
-                                if (c == null) {
-                                    String title = object.getString("title");
-                                    long time = object.getDate("date").getTime();
-                                    String text = object.getString("text");
-                                    String suggestion = object.getString("suggestion");
-                                    int type = object.getInt("type");
-                                    Record record = new Record(id, title, time, text, suggestion, 0, type);
-                                    RecordSQLManager.getInstance().insertData(record);
-                                }
-                                object.put("status", Constants.STATUS_COMPLETE);
-                                object.saveInBackground();
-                            }
-                            showToast(R.string.sync_success);
-                            updateData();
-                        } else {
-                            e.printStackTrace();
-                        }
-                    }
-                });
-            }
-
-            @Override
-            public void notLoggedIn() {
-                showToast(R.string.not_loggedin);
-            }
-
-            @Override
-            public void errorNetwork() {
-                showToast(R.string.network_error);
-            }
-
-            @Override
-            public void errorUsername() {
-                showToast(R.string.not_loggedin);
-            }
-
-            @Override
-            public void errorChecksum() {
-                showToast(R.string.not_loggedin);
-            }
-        });
-    }
-
     private void updateData() {
-        long ver = RecordSQLManager.getInstance().getVersion();
+        long ver = RecordSyncManager.getInstance().getSQLManager().getVersion();
         if (ver != version) {
             List<String> flag = new ArrayList<>();
 
-            List<Record> records = RecordSQLManager.getInstance().selectAll();
+            List<Record> records = RecordSyncManager.getInstance().getSQLManager().selectAll();
             dates.clear();
             for (Record record: records) {
-                long time = record.mTime;
-                Date temp = new Date(time);
+                Date temp = record.mTime;
 
                 Date date = new Date(0);
                 date.setYear(temp.getYear());
@@ -244,12 +224,12 @@ public class RecordFragment extends BaseFragment {
     }
 
     private void refreshCard() {
-        Record latest = RecordSQLManager.getInstance().selectLatest("TIME", false);
+        Record latest = RecordSyncManager.getInstance().getSQLManager().selectLatest("TIME", false);
         if (latest != null) {
             String title = latest.mTitle;
             String text = latest.mText;
             String suggestion = latest.mSuggestion;
-            Date time = new Date(latest.mTime);
+            Date time = latest.mTime;
             DateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
             titleView.setText(title);

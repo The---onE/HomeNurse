@@ -3,15 +3,19 @@ package com.xmx.homenurse.User;
 import android.content.ContentValues;
 import android.database.Cursor;
 
+import com.avos.avoscloud.AVObject;
+import com.xmx.homenurse.Tools.Data.Cloud.ICloudEntity;
 import com.xmx.homenurse.Tools.Data.SQL.ISQLEntity;
+import com.xmx.homenurse.Tools.Data.Sync.ISyncEntity;
 
 import java.util.Date;
 
 /**
  * Created by The_onE on 2016/6/9.
  */
-public class User implements ISQLEntity {
+public class User implements ISyncEntity {
     public long mId = -1;
+    public String mCloudId = null;
     public String mName;
     public String mGender;
     public Date mBirthday;
@@ -25,9 +29,8 @@ public class User implements ISQLEntity {
     public User() {
     }
 
-    public User(long id, String name, String gender, Date birthday, double height, double weight,
-                 String idNumber, String phone, String email, String address) {
-        mId = id;
+    public User(String name, String gender, Date birthday, double height, double weight,
+                String idNumber, String phone, String email, String address) {
         mName = name;
         mGender = gender;
         mBirthday = birthday;
@@ -42,16 +45,17 @@ public class User implements ISQLEntity {
     @Override
     public String tableFields() {
         return "ID integer not null primary key autoincrement, " +
-                "NAME text not null, " +
-                "GENDER text not null, " +
-                "BIRTHDAY integer not null default(0), " +
-                "HEIGHT real not null default(0), " +
-                "WEIGHT real not null default(0), " +
-                "ID_NUMBER text, " +
-                "PHONE text, " +
-                "EMAIL text, " +
-                "ADDRESS text, " +
-                "TYPE integer default(0)";
+                "name text not null, " +
+                "gender text not null, " +
+                "birthday integer not null default(0), " +
+                "height real not null default(0), " +
+                "weight real not null default(0), " +
+                "idNumber text, " +
+                "phone text, " +
+                "email text, " +
+                "address text, " +
+                "type integer default(0), " +
+                "CLOUD_ID text";
     }
 
     @Override
@@ -60,15 +64,16 @@ public class User implements ISQLEntity {
         if (mId > 0) {
             content.put("ID", mId);
         }
-        content.put("NAME", mName);
-        content.put("GENDER", mGender);
-        content.put("BIRTHDAY", mBirthday.getTime());
-        content.put("HEIGHT", mHeight);
-        content.put("WEIGHT", mWeight);
-        content.put("ID_NUMBER", mIdNumber);
-        content.put("PHONE", mPhone);
-        content.put("EMAIL", mEmail);
-        content.put("ADDRESS", mAddress);
+        content.put("name", mName);
+        content.put("gender", mGender);
+        content.put("birthday", mBirthday.getTime());
+        content.put("height", mHeight);
+        content.put("weight", mWeight);
+        content.put("idNumber", mIdNumber);
+        content.put("phone", mPhone);
+        content.put("email", mEmail);
+        content.put("address", mAddress);
+        content.put("CLOUD_ID", mCloudId);
         return content;
     }
 
@@ -85,6 +90,48 @@ public class User implements ISQLEntity {
         user.mPhone = c.getString(7);
         user.mEmail = c.getString(8);
         user.mAddress = c.getString(9);
+        user.mCloudId = c.getString(11);
         return user;
+    }
+
+    @Override
+    public String getCloudId() {
+        return mCloudId;
+    }
+
+    @Override
+    public void setCloudId(String id) {
+        mCloudId = id;
+    }
+
+    @Override
+    public AVObject getContent(String tableName) {
+        AVObject post = new AVObject(tableName);
+        post.put("name", mName);
+        post.put("gender", mGender);
+        post.put("birthday", mBirthday);
+        post.put("height", mHeight);
+        post.put("weight", mWeight);
+        post.put("idNumber", mIdNumber);
+        post.put("phone", mPhone);
+        post.put("email", mEmail);
+        post.put("address", mAddress);
+        return post;
+    }
+
+    @Override
+    public User convertToEntity(AVObject object) {
+        User entity = new User();
+        entity.mCloudId = object.getObjectId();
+        entity.mName = object.getString("name");
+        entity.mGender = object.getString("gender");
+        entity.mBirthday = object.getDate("birthday");
+        entity.mHeight = object.getDouble("height");
+        entity.mWeight = object.getDouble("weight");
+        entity.mIdNumber = object.getString("idNumber");
+        entity.mPhone = object.getString("phone");
+        entity.mEmail = object.getString("email");
+        entity.mAddress = object.getString("address");
+        return entity;
     }
 }

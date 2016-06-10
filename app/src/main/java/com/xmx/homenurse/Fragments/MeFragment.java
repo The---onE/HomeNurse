@@ -18,12 +18,15 @@ import com.avos.avoscloud.SaveCallback;
 import com.bigkoo.pickerview.OptionsPickerView;
 import com.bigkoo.pickerview.TimePickerView;
 import com.xmx.homenurse.Tools.BaseFragment;
+import com.xmx.homenurse.Tools.Data.Callback.InsertCallback;
+import com.xmx.homenurse.Tools.Data.Callback.SelectCallback;
+import com.xmx.homenurse.Tools.Data.Callback.UpdateCallback;
 import com.xmx.homenurse.User.Callback.AutoLoginCallback;
 import com.xmx.homenurse.User.User;
 import com.xmx.homenurse.User.UserManager;
-import com.xmx.homenurse.User.UserSQLManager;
 import com.xmx.homenurse.R;
 import com.xmx.homenurse.User.LoginActivity;
+import com.xmx.homenurse.User.UserSyncManager;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -183,37 +186,107 @@ public class MeFragment extends BaseFragment {
     protected void processLogic(View view, Bundle savedInstanceState) {
         UserManager.getInstance().checkLogin(new AutoLoginCallback() {
             @Override
-            public void success(AVObject user) {
-                long id = UserManager.getId(user);
-                User u = UserSQLManager.getInstance().selectById(id);
-                if (u != null) {
-                    nameView.setText(u.mName);
-                    genderView.setText(u.mGender);
-                    for (int i = 0; i < genders.size(); ++i) {
-                        String s = genders.get(i);
-                        if (s.equals(u.mGender)) {
-                            pvOptions.setSelectOptions(i);
-                            break;
+            public void success(final AVObject user) {
+                UserSyncManager.getInstance().syncFromCloud(null, new SelectCallback<User>() {
+                    @Override
+                    public void success(List<User> users) {
+                        User u;
+                        if (users.size() > 0) {
+                            u = users.get(0);
+                            nameView.setText(u.mName);
+                            genderView.setText(u.mGender);
+                            for (int i = 0; i < genders.size(); ++i) {
+                                String s = genders.get(i);
+                                if (s.equals(u.mGender)) {
+                                    pvOptions.setSelectOptions(i);
+                                    break;
+                                }
+                            }
+
+                            Date d = u.mBirthday;
+                            pvTime.setTime(d);
+                            birthday = d;
+                            DateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                            birthdayView.setText(df.format(d));
+
+                            heightView.setText("" + u.mHeight);
+                            weightView.setText("" + u.mWeight);
+                            idNumberView.setText(u.mIdNumber);
+                            phoneView.setText(u.mPhone);
+                            emailView.setText(u.mEmail);
+                            addressView.setText(u.mAddress);
+                        } else {
+                            u = new User("", genders.get(0),
+                                    new Date(0), 0, 0, "", "", "", "");
+                            UserSyncManager.getInstance().insertData(u, new InsertCallback() {
+                                @Override
+                                public void success(String objectId) {
+
+                                }
+
+                                @Override
+                                public void notInit() {
+                                    showToast(R.string.failure);
+                                }
+
+                                @Override
+                                public void syncError(AVException e) {
+                                    showToast(R.string.sync_failure);
+                                }
+
+                                @Override
+                                public void notLoggedIn() {
+                                    showToast(R.string.not_loggedin);
+                                }
+
+                                @Override
+                                public void errorNetwork() {
+                                    showToast(R.string.network_error);
+                                }
+
+                                @Override
+                                public void errorUsername() {
+                                    showToast(R.string.username_error);
+                                }
+
+                                @Override
+                                public void errorChecksum() {
+                                    showToast(R.string.not_loggedin);
+                                }
+                            });
                         }
                     }
 
-                    Date d = u.mBirthday;
-                    pvTime.setTime(d);
-                    birthday = d;
-                    DateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-                    birthdayView.setText(df.format(d));
+                    @Override
+                    public void notInit() {
+                        showToast(R.string.failure);
+                    }
 
-                    heightView.setText("" + u.mHeight);
-                    weightView.setText("" + u.mWeight);
-                    idNumberView.setText(u.mIdNumber);
-                    phoneView.setText(u.mPhone);
-                    emailView.setText(u.mEmail);
-                    addressView.setText(u.mAddress);
-                } else {
-                    u = new User(id, "", genders.get(0),
-                            new Date(0), 0, 0, "", "", "", "");
-                    UserSQLManager.getInstance().insertData(u);
-                }
+                    @Override
+                    public void syncError(AVException e) {
+                        showToast(R.string.sync_failure);
+                    }
+
+                    @Override
+                    public void notLoggedIn() {
+                        showToast(R.string.not_loggedin);
+                    }
+
+                    @Override
+                    public void errorNetwork() {
+                        showToast(R.string.network_error);
+                    }
+
+                    @Override
+                    public void errorUsername() {
+                        showToast(R.string.username_error);
+                    }
+
+                    @Override
+                    public void errorChecksum() {
+                        showToast(R.string.not_loggedin);
+                    }
+                });
             }
 
             @Override
@@ -259,36 +332,141 @@ public class MeFragment extends BaseFragment {
         UserManager.getInstance().checkLogin(new AutoLoginCallback() {
             @Override
             public void success(AVObject user) {
-                String name = "'" + nameView.getText().toString() + "'";
-                String gen = "'" + gender + "'";
-                double height = getEditViewDouble(heightView);
-                double weight = getEditViewDouble(weightView);
+                final String name = nameView.getText().toString();
+                final double height = getEditViewDouble(heightView);
+                final double weight = getEditViewDouble(weightView);
 
-                String idN = idNumberView.getText().toString();
-                if (!idN.equals("")) {
+                final String idNumber = idNumberView.getText().toString();
+                if (!idNumber.equals("")) {
                     String regex = "(^\\d{15}$)|(^\\d{17}([0-9]|X)$)";
                     Pattern pattern = Pattern.compile(regex);
-                    Matcher matcher = pattern.matcher(idN);
+                    Matcher matcher = pattern.matcher(idNumber);
                     if (!matcher.find()) {
                         showToast(R.string.error_id);
                         return;
                     }
                 }
-                String idNumber = "'" + idN + "'";
-                String phone = "'" + phoneView.getText().toString() + "'";
-                String email = "'" + emailView.getText().toString() + "'";
-                String address = "'" + addressView.getText().toString() + "'";
+                final String phone = phoneView.getText().toString();
+                final String email = emailView.getText().toString();
+                final String address = addressView.getText().toString();
 
-                long id = UserManager.getId(user);
-                if (id > 0) {
-                    UserSQLManager.getInstance().updateUser(id, name, gen, birthday, height,
-                            weight, idNumber, phone, email, address);
-                } else {
-                    User u = new User(id, name, gen, birthday,
-                            height, weight, idNumber, phone, email, address);
-                    UserSQLManager.getInstance().insertData(u);
-                }
-                syncToCloud(name, gen, birthday, height, weight, idNumber, phone, email, address);
+                UserSyncManager.getInstance().syncFromCloud(null, new SelectCallback<User>() {
+                    @Override
+                    public void success(List<User> users) {
+                        User u;
+                        if (users.size() > 0) {
+                            u = users.get(0);
+                            UserSyncManager.getInstance().updateUser(u.mCloudId,
+                                    name, gender, birthday, height,
+                                    weight, idNumber, phone, email, address, new UpdateCallback() {
+                                        @Override
+                                        public void success() {
+
+                                        }
+
+                                        @Override
+                                        public void notInit() {
+                                            showToast(R.string.failure);
+                                        }
+
+                                        @Override
+                                        public void syncError(AVException e) {
+                                            showToast(R.string.sync_failure);
+                                        }
+
+                                        @Override
+                                        public void notLoggedIn() {
+                                            showToast(R.string.not_loggedin);
+                                        }
+
+                                        @Override
+                                        public void errorNetwork() {
+                                            showToast(R.string.network_error);
+                                        }
+
+                                        @Override
+                                        public void errorUsername() {
+                                            showToast(R.string.username_error);
+                                        }
+
+                                        @Override
+                                        public void errorChecksum() {
+                                            showToast(R.string.not_loggedin);
+                                        }
+                                    });
+                        } else {
+                            u = new User(name, gender, birthday,
+                                    height, weight, idNumber, phone, email, address);
+                            UserSyncManager.getInstance().insertData(u, new InsertCallback() {
+                                @Override
+                                public void success(String objectId) {
+
+                                }
+
+                                @Override
+                                public void notInit() {
+                                    showToast(R.string.failure);
+                                }
+
+                                @Override
+                                public void syncError(AVException e) {
+                                    showToast(R.string.sync_failure);
+                                }
+
+                                @Override
+                                public void notLoggedIn() {
+                                    showToast(R.string.not_loggedin);
+                                }
+
+                                @Override
+                                public void errorNetwork() {
+                                    showToast(R.string.network_error);
+                                }
+
+                                @Override
+                                public void errorUsername() {
+                                    showToast(R.string.username_error);
+                                }
+
+                                @Override
+                                public void errorChecksum() {
+                                    showToast(R.string.not_loggedin);
+                                }
+                            });
+                        }
+                    }
+
+                    @Override
+                    public void notInit() {
+                        showToast(R.string.failure);
+                    }
+
+                    @Override
+                    public void syncError(AVException e) {
+                        showToast(R.string.sync_failure);
+                    }
+
+                    @Override
+                    public void notLoggedIn() {
+                        showToast(R.string.not_loggedin);
+                    }
+
+                    @Override
+                    public void errorNetwork() {
+                        showToast(R.string.network_error);
+                    }
+
+                    @Override
+                    public void errorUsername() {
+                        showToast(R.string.username_error);
+                    }
+
+                    @Override
+                    public void errorChecksum() {
+                        showToast(R.string.not_loggedin);
+                    }
+                });
+
                 showToast(R.string.save_success);
                 nameView.setEnabled(false);
                 genderView.setEnabled(false);
@@ -334,70 +512,5 @@ public class MeFragment extends BaseFragment {
         });
 
         return true;
-    }
-
-    public void syncToCloud(final String name, final String gender, final Date birthday,
-                            final double height, final double weight,
-                            final String idNumber, final String phone, final String email,
-                            final String address) {
-        UserManager.getInstance().checkLogin(new AutoLoginCallback() {
-            @Override
-            public void success(final AVObject user) {
-                AVQuery<AVObject> query = new AVQuery<>("PatientsPersonal");
-                query.whereEqualTo("username", user.getString("username"));
-                query.findInBackground(new FindCallback<AVObject>() {
-                    @Override
-                    public void done(List<AVObject> list, AVException e) {
-                        AVObject post;
-                        if (list.size() > 0) {
-                            post = list.get(0);
-                        } else {
-                            post = new AVObject("PatientsPersonal");
-                        }
-                        post.put("username", user.getString("username"));
-                        post.put("name", name);
-                        post.put("gender", gender);
-                        post.put("birthday", birthday);
-                        post.put("height", height);
-                        post.put("weight", weight);
-                        post.put("idNumber", idNumber);
-                        post.put("phone", phone);
-                        post.put("email", email);
-                        post.put("address", address);
-                        post.saveInBackground(new SaveCallback() {
-                            @Override
-                            public void done(AVException e) {
-                                if (e == null) {
-                                    showToast(R.string.add_success);
-                                } else {
-                                    showToast(R.string.sync_success);
-                                    e.printStackTrace();
-                                }
-                            }
-                        });
-                    }
-                });
-            }
-
-            @Override
-            public void notLoggedIn() {
-                showToast(R.string.not_loggedin);
-            }
-
-            @Override
-            public void errorNetwork() {
-                showToast(R.string.network_error);
-            }
-
-            @Override
-            public void errorUsername() {
-                showToast(R.string.not_loggedin);
-            }
-
-            @Override
-            public void errorChecksum() {
-                showToast(R.string.not_loggedin);
-            }
-        });
     }
 }

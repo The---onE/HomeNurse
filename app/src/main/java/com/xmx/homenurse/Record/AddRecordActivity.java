@@ -15,6 +15,7 @@ import com.bigkoo.pickerview.TimePickerView;
 import com.xmx.homenurse.Constants;
 import com.xmx.homenurse.Tools.ActivityBase.BaseTempActivity;
 import com.xmx.homenurse.R;
+import com.xmx.homenurse.Tools.Data.Callback.InsertCallback;
 import com.xmx.homenurse.User.Callback.AutoLoginCallback;
 import com.xmx.homenurse.User.UserManager;
 
@@ -52,7 +53,7 @@ public class AddRecordActivity extends BaseTempActivity {
     protected void setListener() {
         final TimePickerView pvTime = new TimePickerView(this, TimePickerView.Type.YEAR_MONTH_DAY);
         Calendar calendar = Calendar.getInstance();
-        pvTime.setRange(calendar.get(Calendar.YEAR)-50, calendar.get(Calendar.YEAR) + 49);
+        pvTime.setRange(calendar.get(Calendar.YEAR) - 50, calendar.get(Calendar.YEAR) + 49);
         pvTime.setTime(new Date());
         pvTime.setCancelable(true);
         pvTime.setCyclic(true);
@@ -116,62 +117,46 @@ public class AddRecordActivity extends BaseTempActivity {
                 EditText suggestionView = getViewById(R.id.suggestion);
                 String suggestion = suggestionView.getText().toString();
 
-                Record record = new Record(-1, title, recordDate.getTime(), text, suggestion, 0, recordType);
+                Record record = new Record(title, recordDate, text, suggestion,
+                        Constants.STATUS_WAITING, recordType);
 
-                RecordSQLManager.getInstance().insertData(record);
-                pushToCloud(title, recordDate, text, suggestion, recordType);
-                showToast("记录成功");
-                finish();
-            }
-        });
-    }
-
-
-    private void pushToCloud(String title, Date date, String text, String suggestion, int type) {
-        final AVObject post = new AVObject("Prescription");
-        post.put("title", title);
-        post.put("date", date);
-        post.put("text", text);
-        post.put("suggestion", suggestion);
-        post.put("type", type);
-        post.put("status", Constants.STATUS_WAITING);
-        //post.put("patient", id);
-        UserManager.getInstance().checkLogin(new AutoLoginCallback() {
-            @Override
-            public void success(AVObject user) {
-                //post.put("doctor", user.getObjectId());
-                post.put("patient", user.getObjectId());
-                post.saveInBackground(new SaveCallback() {
+                RecordSyncManager.getInstance().insertData(record, new InsertCallback() {
                     @Override
-                    public void done(AVException e) {
-                        if (e==null) {
-                            showToast(R.string.save_success);
-                            finish();
-                        } else {
-                            e.printStackTrace();
-                        }
+                    public void success(String objectId) {
+                        showToast(R.string.save_success);
+                        finish();
+                    }
+
+                    @Override
+                    public void notInit() {
+                        showToast(R.string.sync_failure);
+                    }
+
+                    @Override
+                    public void syncError(AVException e) {
+                        showToast(R.string.sync_failure);
+                    }
+
+                    @Override
+                    public void notLoggedIn() {
+                        showToast(R.string.not_loggedin);
+                    }
+
+                    @Override
+                    public void errorNetwork() {
+                        showToast(R.string.network_error);
+                    }
+
+                    @Override
+                    public void errorUsername() {
+                        showToast(R.string.not_loggedin);
+                    }
+
+                    @Override
+                    public void errorChecksum() {
+                        showToast(R.string.not_loggedin);
                     }
                 });
-            }
-
-            @Override
-            public void notLoggedIn() {
-                showToast(R.string.not_loggedin);
-            }
-
-            @Override
-            public void errorNetwork() {
-                showToast(R.string.network_error);
-            }
-
-            @Override
-            public void errorUsername() {
-                showToast(R.string.not_loggedin);
-            }
-
-            @Override
-            public void errorChecksum() {
-                showToast(R.string.not_loggedin);
             }
         });
     }

@@ -4,19 +4,17 @@ import android.content.ContentValues;
 import android.database.Cursor;
 
 import com.avos.avoscloud.AVObject;
-import com.xmx.homenurse.Constants;
-import com.xmx.homenurse.Tools.Data.Cloud.ICloudEntity;
-import com.xmx.homenurse.Tools.Data.SQL.ISQLEntity;
+import com.xmx.homenurse.Tools.Data.Sync.ISyncEntity;
 
 import java.util.Date;
 
 /**
  * Created by The_onE on 2016/4/2.
  */
-public class Record implements ISQLEntity, ICloudEntity {
+public class Record implements ISyncEntity {
     public long mId = -1;
     public String mTitle;
-    public long mTime;
+    public Date mTime;
     public String mText;
     public String mSuggestion;
     public int mStatus;
@@ -26,8 +24,7 @@ public class Record implements ISQLEntity, ICloudEntity {
     public Record() {
     }
 
-    public Record(long id, String title, long time, String text, String suggestion, int status, int type) {
-        mId = id;
+    public Record(String title, Date time, String text, String suggestion, int status, int type) {
         mTitle = title;
         mTime = time;
         mText = text;
@@ -55,7 +52,7 @@ public class Record implements ISQLEntity, ICloudEntity {
             content.put("ID", mId);
         }
         content.put("TITLE", mTitle);
-        content.put("TIME", mTime);
+        content.put("TIME", mTime.getTime());
         content.put("TEXT", mText);
         content.put("SUGGESTION", mSuggestion);
         content.put("STATUS", mStatus);
@@ -69,7 +66,7 @@ public class Record implements ISQLEntity, ICloudEntity {
         Record record = new Record();
         record.mId = c.getLong(0);
         record.mTitle = c.getString(1);
-        record.mTime = c.getLong(2);
+        record.mTime = new Date(c.getLong(2));
         record.mText = c.getString(3);
         record.mSuggestion = c.getString(4);
         record.mStatus = c.getInt(5);
@@ -81,7 +78,7 @@ public class Record implements ISQLEntity, ICloudEntity {
     public AVObject getContent(String tableName) {
         AVObject object = new AVObject(tableName);
         object.put("title", mTitle);
-        object.put("date", new Date(mTime));
+        object.put("date", mTime);
         object.put("text", mText);
         object.put("suggestion", mSuggestion);
         object.put("type", mType);
@@ -91,19 +88,24 @@ public class Record implements ISQLEntity, ICloudEntity {
 
     @Override
     public Record convertToEntity(AVObject object) {
-        int id = Math.abs(object.getObjectId().hashCode());
-        Record c = RecordSQLManager.getInstance().selectById(id);
-        if (c == null) {
-            String title = object.getString("title");
-            long time = object.getDate("date").getTime();
-            String text = object.getString("text");
-            String suggestion = object.getString("suggestion");
-            int type = object.getInt("type");
-            c = new Record(id, title, time, text, suggestion, 0, type);
-        }
+        Record c = new Record();
+        c.mTitle = object.getString("title");
+        c.mTime = object.getDate("date");
+        c.mText = object.getString("text");
+        c.mSuggestion = object.getString("suggestion");
+        c.mType = object.getInt("type");
+        c.mStatus = object.getInt("status");
         c.mCloudId = object.getObjectId();
-        object.put("status", Constants.STATUS_COMPLETE);
-        object.saveInBackground();
         return c;
+    }
+
+    @Override
+    public String getCloudId() {
+        return mCloudId;
+    }
+
+    @Override
+    public void setCloudId(String id) {
+        mCloudId = id;
     }
 }
