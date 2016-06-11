@@ -4,12 +4,15 @@
     android:layout_height="fill_parent"
     android:orientation="vertical">
 
-    <include layout="@layout/tool_bar" />
+    <include
+        android:id="@+id/bar"
+        layout="@layout/tool_bar" />
 
     <LinearLayout
         android:id="@+id/clock"
         android:layout_width="match_parent"
         android:layout_height="300dp"
+        android:layout_below="@id/bar"
         android:background="@drawable/schedule_bg">
 
         <AnalogClock

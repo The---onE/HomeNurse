@@ -76,7 +76,11 @@
         <activity
             android:name=".Measure.MeasureActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".Measure.Schedule.ScheduleActivity"
+        <activity
+            android:name=".Measure.Schedule.ScheduleActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".Prescription.PrescriptionActivity"
             android:theme="@style/AppTheme.NoActionBar" />
 
         <service

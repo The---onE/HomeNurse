@@ -51,4 +51,5 @@ dependencies {
     compile ('cn.leancloud.android:avoscloud-statistics:v3.+')
 
     compile files('libs/xcl-charts.jar')
+    compile 'com.akexorcist:bluetoothspp:1.0.0'
 }

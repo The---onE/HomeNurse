@@ -80,7 +80,7 @@ public class User implements ISyncEntity {
     @Override
     public User convertToEntity(Cursor c) {
         User user = new User();
-        user.mId = c.getInt(0);
+        user.mId = c.getLong(0);
         user.mName = c.getString(1);
         user.mGender = c.getString(2);
         user.mBirthday = new Date(c.getLong(3));
