@@ -20,7 +20,7 @@ public class RecordSyncManager extends BaseSyncEntityManager<Record> {
     }
 
     private RecordSyncManager() {
-        setTableName("Prescription");
+        setTableName("Record");
         setEntityTemplate(new Record());
         setUserField("patient");
     }

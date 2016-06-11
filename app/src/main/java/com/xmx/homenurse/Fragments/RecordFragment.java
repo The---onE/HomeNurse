@@ -12,12 +12,14 @@ import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
 import com.avos.avoscloud.AVQuery;
 import com.avos.avoscloud.FindCallback;
+import com.xmx.homenurse.Measure.MeasureActivity;
 import com.xmx.homenurse.Record.Record;
 import com.xmx.homenurse.Record.RecordAmountADayActivity;
 import com.xmx.homenurse.Record.RecordSyncManager;
@@ -172,6 +174,14 @@ public class RecordFragment extends BaseFragment {
             public void onClick(View view) {
                 Intent intent = new Intent(getContext(), AddRecordActivity.class);
                 startActivity(intent);
+            }
+        });
+
+        Button measure =  (Button) view.findViewById(R.id.btn_measure);
+        measure.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(MeasureActivity.class);
             }
         });
     }

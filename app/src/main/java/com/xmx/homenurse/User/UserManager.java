@@ -11,6 +11,15 @@ import com.avos.avoscloud.CountCallback;
 import com.avos.avoscloud.FindCallback;
 import com.avos.avoscloud.GetCallback;
 import com.avos.avoscloud.SaveCallback;
+import com.xmx.homenurse.Appointment.Appointment;
+import com.xmx.homenurse.Appointment.AppointmentSyncManager;
+import com.xmx.homenurse.Measure.Data.BloodPressure.BloodPressure;
+import com.xmx.homenurse.Measure.Data.BloodPressure.BloodPressureManager;
+import com.xmx.homenurse.Measure.Data.HeartRate.HeartRateManager;
+import com.xmx.homenurse.Measure.Data.Pules.PulesManager;
+import com.xmx.homenurse.Measure.Data.Temperature.TemperatureManager;
+import com.xmx.homenurse.Record.Record;
+import com.xmx.homenurse.Record.RecordSyncManager;
 import com.xmx.homenurse.User.Callback.AutoLoginCallback;
 import com.xmx.homenurse.User.Callback.LoginCallback;
 import com.xmx.homenurse.User.Callback.RegisterCallback;
@@ -83,6 +92,8 @@ public class UserManager {
         editor.putString("checksum", "");
         editor.putString("nickname", "");
         editor.apply();
+
+        clearDatabase();
     }
 
     public void logout() {
@@ -95,14 +106,9 @@ public class UserManager {
                 public void done(List<AVObject> list, AVException e) {
                     if (e == null) {
                         if (list.size() > 0) {
-                            SharedPreferences.Editor editor = mSP.edit();
-                            editor.putBoolean("loggedin", false);
-                            editor.putString("username", "");
-                            editor.putString("checksum", "");
-                            editor.putString("nickname", "");
-                            editor.apply();
-
                             AVObject user = list.get(0);
+                            logout(user);
+
                             /*List<String> subscribing = user.getList("subscribing");
                             if (subscribing != null) {
                                 for (String sub : subscribing) {
@@ -321,5 +327,15 @@ public class UserManager {
                 }
             }
         });
+    }
+
+    private void clearDatabase() {
+        RecordSyncManager.getInstance().getSQLManager().clearDatabase();
+        AppointmentSyncManager.getInstance().getSQLManager().clearDatabase();
+        BloodPressureManager.getInstance().getSQLManager().clearDatabase();
+        HeartRateManager.getInstance().getSQLManager().clearDatabase();
+        PulesManager.getInstance().getSQLManager().clearDatabase();
+        TemperatureManager.getInstance().getSQLManager().clearDatabase();
+        UserSyncManager.getInstance().getSQLManager().clearDatabase();
     }
 }

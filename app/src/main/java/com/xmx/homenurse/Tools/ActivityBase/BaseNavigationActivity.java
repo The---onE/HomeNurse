@@ -49,10 +49,10 @@ public abstract class BaseNavigationActivity extends BaseActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        switch (id) {
+        /*switch (id) {
             case R.id.nav_setting:
                 break;
-        }
+        }*/
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);

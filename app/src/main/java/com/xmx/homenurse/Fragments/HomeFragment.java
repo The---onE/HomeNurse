@@ -7,11 +7,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.xmx.homenurse.Measure.Schedule.AddMeasureScheduleActivity;
+import com.xmx.homenurse.Measure.Schedule.ScheduleActivity;
 import com.xmx.homenurse.Tools.BaseFragment;
 import com.xmx.homenurse.Constants;
 import com.xmx.homenurse.Measure.Schedule.MeasureScheduleManager;
@@ -30,8 +33,6 @@ import com.xmx.homenurse.Tools.Timer;
  * A simple {@link Fragment} subclass.
  */
 public class HomeFragment extends BaseFragment {
-    ScheduleAdapter adapter;
-    long version = 0;
 
     @Override
     protected View getContentView(LayoutInflater inflater, ViewGroup container) {
@@ -40,87 +41,24 @@ public class HomeFragment extends BaseFragment {
 
     @Override
     protected void initView(View view) {
-
+        ImageView schedule = (ImageView) view.findViewById(R.id.btn_schedule);
+        schedule.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(ScheduleActivity.class);
+            }
+        });
     }
 
     @Override
     protected void setListener(View view) {
-        RelativeLayout temperature = (RelativeLayout) view.findViewById(R.id.layout_temperature);
-        temperature.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(TemperatureActivity.class);
-            }
-        });
 
-        RelativeLayout pules = (RelativeLayout) view.findViewById(R.id.layout_pules);
-        pules.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(PulesActivity.class);
-            }
-        });
-
-        RelativeLayout heartRate = (RelativeLayout) view.findViewById(R.id.layout_heart_rate);
-        heartRate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(HeartRateActivity.class);
-            }
-        });
-
-        RelativeLayout bloodPressure = (RelativeLayout) view.findViewById(R.id.layout_blood_pressure);
-        bloodPressure.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(BloodPressureActivity.class);
-            }
-        });
-
-        TextView addSchedule = (TextView) view.findViewById(R.id.tv_add_measure_schedule);
-        addSchedule.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(AddMeasureScheduleActivity.class);
-            }
-        });
-
-        adapter = new ScheduleAdapter(getContext());
-        ListView planList = (ListView) view.findViewById(R.id.list_measure_schedule);
-        planList.setAdapter(adapter);
-
-        planList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(getContext(), MeasureScheduleDetailActivity.class);
-                MeasureSchedule measureSchedule = (MeasureSchedule) adapter.getItem(position);
-                intent.putExtra("id", measureSchedule.mId);
-                startActivity(intent);
-            }
-        });
     }
 
     @Override
     protected void processLogic(View view, Bundle savedInstanceState) {
-        updateScheduleList();
-        Timer timer = new Timer() {
-            @Override
-            public void timer() {
-                updateScheduleList();
-            }
-        };
-        timer.start(Constants.UPDATE_FREQUENCY);
-
         Intent service = new Intent(getContext(), MeasureTimerService.class);
         getContext().startService(service);
-    }
-
-    void updateScheduleList() {
-        long ver = MeasureScheduleManager.getInstance().updateMeasureSchedules();
-        if (ver != version) {
-            adapter.changeList();
-            version = ver;
-        }
     }
 
 }
