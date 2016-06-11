@@ -47,28 +47,26 @@ public class TemperatureChartView extends BaseChartView {
         //线1的数据集
         List<PointD> linePoint1 = new ArrayList<>();
 
-        linePoint1.add(new PointD(1d, today));
-        linePoint1.add(new PointD(2d, d1));
-        linePoint1.add(new PointD(3d, d2));
-        linePoint1.add(new PointD(4d, d3));
-        linePoint1.add(new PointD(5d, d4));
-        linePoint1.add(new PointD(6d, d5));
-        linePoint1.add(new PointD(7d, d6));
-        SplineData dataSeries1 = new SplineData("体温", linePoint1,
-                Color.rgb(54, 141, 238));
-
-        dataSeries1.getLinePaint().setStrokeWidth(10);
-
-        chartData.add(dataSeries1);
-
+        double[] x = {1d, 2d, 3d, 4d, 5d, 6d, 7d};
+        double[] y = {d6, d5, d4, d3, d2, d1, today};
         //批注
         List<AnchorDataPoint> mAnchorSet = new ArrayList<>();
+        int count = 0;
         for (int i = 0; i < 7; ++i) {
-            AnchorDataPoint an = new AnchorDataPoint(0, i, XEnum.AnchorStyle.CAPRECT);
-            an.setAnchor("" + linePoint1.get(i).y);
-            an.setTextColor(Color.BLACK);
-            mAnchorSet.add(an);
+            if (y[i] > 0) {
+                linePoint1.add(new PointD(x[i], y[i]));
+                AnchorDataPoint an = new AnchorDataPoint(0, count, XEnum.AnchorStyle.CAPRECT);
+                an.setAnchor("" + y[i]);
+                an.setTextColor(Color.BLACK);
+                mAnchorSet.add(an);
+                count++;
+            }
         }
+        SplineData dataSeries1 = new SplineData("体温", linePoint1,
+                Color.rgb(54, 141, 238));
+        dataSeries1.getLinePaint().setStrokeWidth(10);
+        chartData.clear();
+        chartData.add(dataSeries1);
         chart.setAnchorDataPoint(mAnchorSet);
 
         refreshChart();

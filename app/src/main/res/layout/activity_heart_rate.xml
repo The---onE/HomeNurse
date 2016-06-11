@@ -11,8 +11,8 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="250dp"
-        android:background="@android:color/holo_orange_light">
+        android:layout_height="200dp"
+        android:background="#ffffbb33">
 
         <TextView
             android:id="@+id/tv_heart_rate"
@@ -48,4 +48,11 @@
         android:id="@+id/spline_chart"
         android:layout_width="match_parent"
         android:layout_height="300dp" />
+
+    <Button
+        android:id="@+id/btn_add"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/add"/>
+
 </LinearLayout>

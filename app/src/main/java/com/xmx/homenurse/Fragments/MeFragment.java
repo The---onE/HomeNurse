@@ -12,9 +12,6 @@ import android.widget.TextView;
 
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
-import com.avos.avoscloud.AVQuery;
-import com.avos.avoscloud.FindCallback;
-import com.avos.avoscloud.SaveCallback;
 import com.bigkoo.pickerview.OptionsPickerView;
 import com.bigkoo.pickerview.TimePickerView;
 import com.xmx.homenurse.Tools.BaseFragment;
@@ -322,7 +319,7 @@ public class MeFragment extends BaseFragment {
 
     double getEditViewDouble(EditText et) {
         if (!et.getText().toString().equals("")) {
-            return Float.parseFloat(et.getText().toString());
+            return Double.parseDouble(et.getText().toString());
         } else {
             return 0;
         }

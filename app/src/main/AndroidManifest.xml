@@ -61,6 +61,18 @@
         <activity
             android:name=".Record.RecordAmountADayActivity"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".Measure.Data.HeartRate.AddHeartRateActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".Measure.Data.Pules.AddPulesActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".Measure.Data.Temperature.AddTemperatureActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".Measure.Data.BloodPressure.AddBloodPressureActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
 
         <service
             android:name=".Measure.Schedule.MeasureTimerService"
