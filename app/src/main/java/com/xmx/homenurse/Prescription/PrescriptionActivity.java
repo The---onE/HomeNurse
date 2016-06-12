@@ -9,7 +9,6 @@ import android.widget.TextView;
 import com.avos.avoscloud.AVException;
 import com.xmx.homenurse.R;
 import com.xmx.homenurse.Tools.ActivityBase.BaseTempActivity;
-import com.xmx.homenurse.Tools.Data.Callback.InsertCallback;
 import com.xmx.homenurse.Tools.Data.Callback.SelectCallback;
 
 import java.util.List;
@@ -39,6 +38,30 @@ public class PrescriptionActivity extends BaseTempActivity {
         } else {
             stateText.setText(R.string.bluetooth_unavailable);
         }
+
+        bt.setBluetoothStateListener(new BluetoothSPP.BluetoothStateListener() {
+            public void onServiceStateChanged(int state) {
+                if (state == BluetoothState.STATE_CONNECTED) {
+                    showToast(R.string.connect_bluetooth_success);
+                    stateText.setText(R.string.connect_bluetooth_success);
+                    connectFlag = true;
+                } else if (state == BluetoothState.STATE_CONNECTING) {
+                    showToast(R.string.connecting_bluetooth);
+                    stateText.setText(R.string.connecting_bluetooth);
+                } else if (state == BluetoothState.STATE_LISTEN) {
+                    stateText.setText(R.string.waiting_bluetooth);
+                } else if (state == BluetoothState.STATE_NONE) {
+                    stateText.setText(R.string.no_bluetooth);
+                }
+            }
+        });
+
+        bt.setOnDataReceivedListener(new BluetoothSPP.OnDataReceivedListener() {
+            public void onDataReceived(byte[] data, String message) {
+                showToast("接受到数据：" + data);
+                showToast(message);
+            }
+        });
     }
 
     @Override

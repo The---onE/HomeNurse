@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.xmx.homenurse.Measure.Schedule.AddMeasureScheduleActivity;
 import com.xmx.homenurse.Measure.Schedule.ScheduleActivity;
+import com.xmx.homenurse.NoticeActivity;
 import com.xmx.homenurse.Prescription.Prescription;
 import com.xmx.homenurse.Prescription.PrescriptionActivity;
 import com.xmx.homenurse.Tools.BaseFragment;
@@ -69,6 +70,14 @@ public class HomeFragment extends BaseFragment {
             @Override
             public void onClick(View view) {
                 startActivity(PrescriptionActivity.class);
+            }
+        });
+
+        ImageView notice = (ImageView) view.findViewById(R.id.btn_notice);
+        notice.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(NoticeActivity.class);
             }
         });
     }

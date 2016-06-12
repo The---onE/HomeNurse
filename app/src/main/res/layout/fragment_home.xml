@@ -14,6 +14,7 @@
         android:layout_marginTop="100dp">
 
         <ImageView
+            android:id="@+id/btn_notice"
             android:layout_width="160dp"
             android:layout_height="160dp"
             android:src="@drawable/daily" />

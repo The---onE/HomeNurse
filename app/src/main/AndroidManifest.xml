@@ -82,6 +82,9 @@
         <activity
             android:name=".Prescription.PrescriptionActivity"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".NoticeActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
 
         <service
             android:name=".Measure.Schedule.MeasureTimerService"
