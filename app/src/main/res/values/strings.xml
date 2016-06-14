@@ -11,6 +11,7 @@
     <string name="loading">加载中……</string>
     <string name="failure">加载失败</string>
     <string name="no_data">无相关数据</string>
+    <string name="sending">发送中</string>
 
     <string name="navigation_drawer_open">打开导航栏</string>
     <string name="navigation_drawer_close">关闭导航栏</string>

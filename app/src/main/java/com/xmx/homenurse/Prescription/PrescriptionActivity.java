@@ -10,6 +10,7 @@ import com.avos.avoscloud.AVException;
 import com.xmx.homenurse.R;
 import com.xmx.homenurse.Tools.ActivityBase.BaseTempActivity;
 import com.xmx.homenurse.Tools.Data.Callback.SelectCallback;
+import com.xmx.homenurse.Tools.Timer;
 
 import java.util.List;
 
@@ -22,6 +23,12 @@ public class PrescriptionActivity extends BaseTempActivity {
     boolean connectFlag = false;
     TextView stateText;
     Prescription pre;
+    int sendingRate = 0;
+    String sendingData;
+    Timer sending;
+    boolean sendingFlag = false;
+
+    static long SENDING_INTERVAL = 800;
 
     @Override
     protected void initView(Bundle savedInstanceState) {
@@ -118,18 +125,34 @@ public class PrescriptionActivity extends BaseTempActivity {
                     getViewById(R.id.send_data).setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            if (connectFlag && pre != null) {
-                                String data = "";
+                            if (connectFlag && pre != null && !sendingFlag) {
+                                sendingData = "";
                                 for (int i=0; i<5; ++i) {
                                     int count = pre.mCount[i];
                                     for (int j=0; j<count; ++j) {
-                                        data += "2";
+                                        sendingData += "2";
                                     }
-                                    data += "1";
+                                    sendingData += "1";
                                 }
-                                showToast(data);
-                                if (!data.equals("")) {
-                                    bt.send(data, true);
+                                if (!sendingData.equals("")) {
+                                    showToast(R.string.sending);
+                                    sendingFlag = true;
+                                    sendingRate = 0;
+                                    sending = new Timer() {
+                                        @Override
+                                        public void timer() {
+                                            if (sendingRate < sendingData.length()) {
+                                                char c = sendingData.charAt(sendingRate);
+                                                String data = String.valueOf(c);
+                                                bt.send(data, true);
+                                                sendingRate++;
+                                            } else {
+                                                sending.stop();
+                                                sendingFlag = false;
+                                            }
+                                        }
+                                    };
+                                    sending.start(SENDING_INTERVAL);
                                     showToast(R.string.send_bluetooth_success);
                                 } else {
                                     showToast(R.string.empty_hint);
